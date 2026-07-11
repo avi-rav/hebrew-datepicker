@@ -1,0 +1,311 @@
+/**
+ * heb-date-picker styles.
+ *
+ * Encapsulation is `None` so a single stylesheet themes the whole widget
+ * (field, header, grid, cells). Everything is scoped under `.heb-date-picker`
+ * and every visual is driven by a CSS custom property (`--hdp-*`), so consumers
+ * restyle by overriding variables — no need to touch these selectors
+ * (Open/Closed for CSS).
+ */
+
+.heb-date-picker {
+  /* ---- Theming tokens (override these from your app) ---- */
+  --hdp-font: system-ui, 'Segoe UI', 'Alef', 'Assistant', sans-serif;
+  --hdp-radius: 12px;
+  --hdp-cell-size: 2.35rem;
+
+  --hdp-bg: #ffffff;
+  --hdp-fg: #1f2430;
+  --hdp-muted: #9aa1ad;
+  --hdp-border: #e4e7ec;
+  --hdp-hover: #f3f4f7;
+
+  --hdp-accent: #3b5bdb;
+  --hdp-accent-fg: #ffffff;
+  --hdp-in-range-bg: #dbe4ff;
+
+  --hdp-today-ring: #3b5bdb;
+  --hdp-shabbat-fg: #b4881d;
+  --hdp-holiday-dot: #e8590c;
+  --hdp-rosh-chodesh-fg: #2f9e44;
+
+  --hdp-shadow: 0 10px 30px rgba(20, 24, 40, 0.14);
+
+  position: relative;
+  display: inline-block;
+  direction: rtl;
+  font-family: var(--hdp-font);
+  color: var(--hdp-fg);
+  text-align: right;
+}
+
+/* ---- Popup trigger field ---- */
+.hdp-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 12rem;
+  padding: 0.55rem 0.85rem;
+  font: inherit;
+  color: inherit;
+  background: var(--hdp-bg);
+  border: 1px solid var(--hdp-border);
+  border-radius: var(--hdp-radius);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--hdp-accent);
+  }
+  &:focus-visible {
+    outline: none;
+    border-color: var(--hdp-accent);
+    box-shadow: 0 0 0 3px var(--hdp-in-range-bg);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+.hdp-field__text {
+  flex: 1 1 auto;
+}
+.hdp-field--empty .hdp-field__text {
+  color: var(--hdp-muted);
+}
+.hdp-field__icon {
+  color: var(--hdp-muted);
+  font-size: 0.75em;
+}
+
+/* ---- Calendar panel ---- */
+.hdp-panel {
+  box-sizing: border-box;
+  width: max-content;
+  padding: 0.75rem;
+  background: var(--hdp-bg);
+  border: 1px solid var(--hdp-border);
+  border-radius: var(--hdp-radius);
+}
+.hdp-panel--popup {
+  position: absolute;
+  z-index: 1000;
+  inset-inline-start: 0;
+  margin-top: 0.4rem;
+  box-shadow: var(--hdp-shadow);
+}
+
+/* ---- Header ---- */
+.hdp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+.hdp-header__nav {
+  display: flex;
+  gap: 0.15rem;
+}
+.hdp-header__title {
+  flex: 1 1 auto;
+  padding: 0.35rem 0.5rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--hdp-hover);
+  }
+}
+.hdp-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--hdp-hover);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--hdp-accent);
+    outline-offset: 1px;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* ---- Grid ---- */
+.hdp-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hdp-grid__weekdays,
+.hdp-grid__week {
+  display: grid;
+  grid-template-columns: repeat(7, var(--hdp-cell-size));
+  gap: 2px;
+}
+.hdp-grid__weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--hdp-muted);
+}
+
+/* ---- Day cell ---- */
+.hdp-cell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hdp-cell-size);
+  height: var(--hdp-cell-size);
+  padding: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+
+  &:hover:not(.hdp-cell--disabled):not(.hdp-cell--selected) {
+    background: var(--hdp-hover);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--hdp-accent);
+    outline-offset: 1px;
+  }
+}
+.hdp-cell__label {
+  position: relative;
+  z-index: 1;
+}
+.hdp-cell__dot {
+  position: absolute;
+  bottom: 4px;
+  inset-inline-start: 50%;
+  transform: translateX(50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--hdp-holiday-dot);
+}
+
+.hdp-cell--other-month {
+  color: var(--hdp-muted);
+  opacity: 0.55;
+}
+.hdp-cell--shabbat {
+  color: var(--hdp-shabbat-fg);
+}
+.hdp-cell--rosh-chodesh .hdp-cell__label {
+  text-decoration: underline;
+  text-decoration-color: var(--hdp-rosh-chodesh-fg);
+  text-underline-offset: 3px;
+}
+.hdp-cell--today {
+  box-shadow: inset 0 0 0 1.5px var(--hdp-today-ring);
+  font-weight: 700;
+}
+.hdp-cell--disabled {
+  color: var(--hdp-muted);
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+/* Range highlight (drawn beneath the label) */
+.hdp-cell--in-range {
+  background: var(--hdp-in-range-bg);
+  border-radius: 0;
+}
+.hdp-cell--range-start {
+  border-start-start-radius: 9px;
+  border-end-start-radius: 9px;
+}
+.hdp-cell--range-end {
+  border-start-end-radius: 9px;
+  border-end-end-radius: 9px;
+}
+
+/* Selected / range endpoints (highest priority) */
+.hdp-cell--selected,
+.hdp-cell--range-start,
+.hdp-cell--range-end {
+  background: var(--hdp-accent);
+  color: var(--hdp-accent-fg);
+  font-weight: 700;
+
+  &:hover {
+    background: var(--hdp-accent);
+  }
+  .hdp-cell__dot {
+    background: var(--hdp-accent-fg);
+  }
+}
+
+/* ---- Legend ---- */
+.hdp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--hdp-border);
+  font-size: 0.72rem;
+  color: var(--hdp-muted);
+}
+.hdp-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.hdp-legend__swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 3px;
+}
+.hdp-legend__swatch--holiday {
+  background: var(--hdp-holiday-dot);
+}
+.hdp-legend__swatch--shabbat {
+  background: var(--hdp-shabbat-fg);
+}
+.hdp-legend__swatch--today {
+  box-shadow: inset 0 0 0 1.5px var(--hdp-today-ring);
+}
+
+/* ---- Dark theme (opt-in via [data-theme="dark"] on any ancestor) ---- */
+:where([data-theme='dark']) .heb-date-picker {
+  --hdp-bg: #1a1d24;
+  --hdp-fg: #e8eaed;
+  --hdp-muted: #7b828f;
+  --hdp-border: #2c313b;
+  --hdp-hover: #242832;
+  --hdp-accent: #5c7cfa;
+  --hdp-in-range-bg: #2a3358;
+  --hdp-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}

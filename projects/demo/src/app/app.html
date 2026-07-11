@@ -1,0 +1,98 @@
+<header class="page-head">
+  <h1>לוח עברי · <span class="mono">heb-date-picker</span></h1>
+  <p>Date Picker לפי הלוח העברי עם תאריכי גימטריה (למשל <b>כ״א אלול תשפ״ו</b>) — Angular, RTL, טווח, חגים ושבתות.</p>
+  <button class="theme-toggle" type="button" (click)="toggleDark()">
+    {{ dark() ? '☀️ מצב בהיר' : '🌙 מצב כהה' }}
+  </button>
+</header>
+
+<!-- 1. Interactive playground -->
+<section class="card">
+  <h2>1 · מגרש משחקים אינטראקטיבי</h2>
+  <p class="muted">שנו את האפשרויות וראו את הרכיב מגיב בזמן אמת.</p>
+
+  <div class="playground">
+    <div class="controls">
+      <label><input type="checkbox" [ngModel]="showNikud()" (ngModelChange)="showNikud.set($event)" /> ניקוד (nikud)</label>
+      <label><input type="checkbox" [ngModel]="israel()" (ngModelChange)="israel.set($event)" /> חגי ארץ ישראל</label>
+      <label><input type="checkbox" [ngModel]="inline()" (ngModelChange)="inline.set($event)" /> תצוגה מוטמעת (inline)</label>
+      <label>
+        תחילת שבוע:
+        <select [ngModel]="firstDayOfWeek()" (ngModelChange)="firstDayOfWeek.set(+$event)">
+          <option [value]="0">ראשון</option>
+          <option [value]="1">שני</option>
+          <option [value]="6">שבת</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="stage">
+      <heb-date-picker
+        [(ngModel)]="singleValue"
+        [showNikud]="showNikud()"
+        [israel]="israel()"
+        [inline]="inline()"
+        [firstDayOfWeek]="firstDayOfWeek()"
+      />
+      <p class="result">נבחר: <b>{{ singleText() }}</b></p>
+    </div>
+  </div>
+</section>
+
+<div class="grid">
+  <!-- 2. Popup + ngModel -->
+  <section class="card">
+    <h2>2 · שדה קופץ (popup)</h2>
+    <p class="muted">לחיצה על השדה פותחת את הלוח; בחירת יום סוגרת אותו.</p>
+    <heb-date-picker [(ngModel)]="popupValue" [inline]="false" placeholder="בחרו תאריך…" />
+    <p class="result">נבחר: <b>{{ popupText() }}</b></p>
+  </section>
+
+  <!-- 3. Range -->
+  <section class="card">
+    <h2>3 · טווח תאריכים (range)</h2>
+    <p class="muted">קליק ראשון = התחלה, קליק שני = סוף. הימים שביניהם מודגשים.</p>
+    <heb-date-picker [(ngModel)]="rangeValue" mode="range" [inline]="true" />
+    <p class="result">טווח: <b>{{ rangeText() }}</b></p>
+  </section>
+
+  <!-- 4. Constraints -->
+  <section class="card">
+    <h2>4 · מגבלות + ימים חסומים</h2>
+    <p class="muted">מוגבל לחודש הנוכחי + חודש קדימה; שישי ושבת חסומים.</p>
+    <heb-date-picker
+      [(ngModel)]="constrainedValue"
+      [min]="min"
+      [max]="max"
+      [disabledDates]="noWeekends"
+      [inline]="true"
+    />
+    <p class="result">נבחר: <b>{{ constrainedText() }}</b></p>
+  </section>
+
+  <!-- 5. Reactive Forms -->
+  <section class="card">
+    <h2>5 · Reactive Forms</h2>
+    <p class="muted">אותו רכיב, מחובר ל־<span class="mono">FormControl</span> דרך ה־CVA.</p>
+    <heb-date-picker [formControl]="formControl" [inline]="true" />
+    <p class="result">ערך הטופס: <b>{{ formText() }}</b></p>
+    <p class="result muted">מצב: {{ formControl.dirty ? 'שונה' : 'נקי' }} · {{ formControl.valid ? 'תקין' : 'לא תקין' }}</p>
+  </section>
+
+  <!-- 6. Custom theming -->
+  <section class="card">
+    <h2>6 · מיתוג עם CSS Variables</h2>
+    <p class="muted">אותו רכיב, צבעים שונים — דרך <span class="mono">--hdp-*</span> בלבד.</p>
+    <div class="themed-wrap">
+      <heb-date-picker [(ngModel)]="themedValue" [inline]="true" />
+    </div>
+    <p class="result">נבחר: <b>{{ themedText() }}</b></p>
+  </section>
+</div>
+
+<footer class="page-foot">
+  <p class="muted">
+    כל חישובי הלוח (המרות, גימטריה, שנים מעוברות, חגים) מגיעים מחבילת הליבה
+    האגנוסטית <span class="mono">heb-date-core</span> (מבוססת <span class="mono">&#64;hebcal/core</span>).
+  </p>
+</footer>

@@ -1,0 +1,56 @@
+@if (!inline()) {
+  <button
+    type="button"
+    class="hdp-field"
+    [class.hdp-field--empty]="!displayValue()"
+    [attr.aria-haspopup]="'dialog'"
+    [attr.aria-expanded]="open()"
+    [disabled]="disabled()"
+    (click)="toggleOpen()"
+  >
+    <span class="hdp-field__text">{{ displayValue() || placeholder() }}</span>
+    <span class="hdp-field__icon" aria-hidden="true">▾</span>
+  </button>
+}
+
+@if (inline() || open()) {
+  <div
+    class="hdp-panel"
+    [class.hdp-panel--popup]="!inline()"
+    role="dialog"
+    aria-modal="false"
+    [attr.aria-label]="monthView().title"
+  >
+    <div class="hdp-header">
+      <!-- RTL: this group renders on the right (moving back in time) -->
+      <div class="hdp-header__nav">
+        <button type="button" class="hdp-nav-btn" (click)="prevYear()" aria-label="שנה קודמת" [disabled]="disabled()">»</button>
+        <button type="button" class="hdp-nav-btn" (click)="prevMonth()" aria-label="חודש קודם" [disabled]="disabled()">›</button>
+      </div>
+
+      <button type="button" class="hdp-header__title" (click)="goToday()" title="חזרה להיום" [disabled]="disabled()">
+        {{ monthView().title }}
+      </button>
+
+      <!-- RTL: this group renders on the left (moving forward in time) -->
+      <div class="hdp-header__nav">
+        <button type="button" class="hdp-nav-btn" (click)="nextMonth()" aria-label="חודש הבא" [disabled]="disabled()">‹</button>
+        <button type="button" class="hdp-nav-btn" (click)="nextYear()" aria-label="שנה הבאה" [disabled]="disabled()">«</button>
+      </div>
+    </div>
+
+    <heb-calendar-month
+      [view]="monthView()"
+      [weekdays]="weekdays()"
+      [focusedDate]="focused()"
+      (pick)="onPick($event)"
+      (navigate)="onNavigate($event)"
+    />
+
+    <div class="hdp-legend" aria-hidden="true">
+      <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--holiday"></span>חג / מועד</span>
+      <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--shabbat"></span>שבת</span>
+      <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--today"></span>היום</span>
+    </div>
+  </div>
+}

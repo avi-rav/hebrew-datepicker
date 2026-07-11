@@ -1,0 +1,36 @@
+/* Demo global styles + light/dark theme tokens. */
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --fg: #1f2430;
+  --muted: #6b7280;
+  --border: #e4e7ec;
+  --accent: #3b5bdb;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #12141a;
+  --card: #1a1d24;
+  --fg: #e8eaed;
+  --muted: #9aa1ad;
+  --border: #2c313b;
+  --accent: #5c7cfa;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, 'Segoe UI', 'Assistant', 'Alef', sans-serif;
+  line-height: 1.55;
+}
