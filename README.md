@@ -2,9 +2,12 @@
 
 לוח שנה / Date Picker **עברי** עם תאריכי גימטריה (`כ״א אלול תשפ״ו`) ל-Angular.
 
-זהו ה-workspace לפיתוח. אם הגעתם לכאן כדי **להשתמש** בחבילה בפרויקט Angular שלכם,
-ראו [`projects/heb-date-picker/README.md`](projects/heb-date-picker/README.md)
-(`npm i heb-date-picker`).
+📦 npm: [`heb-date-picker`](https://www.npmjs.com/package/heb-date-picker) ·
+🌐 [דמו חי](https://claude.ai/code/artifact/c5ef5418-2ec4-445e-817d-6d5cdb3160f6)
+
+זהו ה-workspace לפיתוח. אם הגעתם לכאן כדי **להשתמש** בחבילה בפרויקט Angular שלכם
+(`npm i heb-date-picker`), כל ההוראות — התקנה, דוגמאות שימוש, ו-API מלא — נמצאות
+ב-[`projects/heb-date-picker/README.md`](projects/heb-date-picker/README.md).
 
 ## מבנה
 
