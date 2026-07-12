@@ -89,11 +89,8 @@
   border: 1px solid var(--hdp-border);
   border-radius: var(--hdp-radius);
 }
+/* In the popup, the CDK overlay positions the pane; the panel just casts a shadow. */
 .hdp-panel--popup {
-  position: absolute;
-  z-index: 1000;
-  inset-inline-start: 0;
-  margin-top: 0.4rem;
   box-shadow: var(--hdp-shadow);
 }
 
@@ -310,4 +307,36 @@
   --hdp-accent: #5c7cfa;
   --hdp-in-range-bg: #2a3358;
   --hdp-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ----------------------------------------------------------------------------
+   Minimal CDK overlay container styles (subset of @angular/cdk overlay-prebuilt).
+   Bundled here so consumers don't need to import a separate CSS file for the
+   popup to position correctly.
+   -------------------------------------------------------------------------- */
+.cdk-overlay-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.cdk-overlay-container:empty {
+  display: none;
+}
+.cdk-overlay-connected-position-bounding-box {
+  position: absolute;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 1px;
+  min-height: 1px;
+}
+.cdk-overlay-pane {
+  position: absolute;
+  z-index: 1000;
+  box-sizing: border-box;
+  display: flex;
+  max-width: 100%;
+  max-height: 100%;
+  pointer-events: auto;
 }

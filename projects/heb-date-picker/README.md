@@ -161,6 +161,17 @@ onPick(value: PickerValue) {
 
 ---
 
+### מצב popup
+
+ברירת המחדל (`inline` לא מוגדר) היא שדה עם אייקון לוח; לחיצה פותחת את הלוח.
+הפאנל מרונדר דרך **CDK Overlay** ומוצמד ל-`document.body`, כך שהוא **צף מעל הכל
+ולא נחתך** גם אם הרכיב יושב בתוך container עם `overflow: hidden` או `transform`.
+אין צורך לייבא CSS נוסף — סגנונות ה-Overlay ארוזים בתוך הרכיב.
+
+```html
+<heb-date-picker [(ngModel)]="date" placeholder="בחרו תאריך…"></heb-date-picker>
+```
+
 ## מצב טווח (range)
 
 ```html
@@ -286,6 +297,7 @@ formatGematriya(new Date(2026, 8, 3), { nikud: true }); // "כ״א אֱלוּל 
 |---|---|---|
 | `heb-date-core` | נמשך אוטומטית | ליבת הלוח (חבילת האחות שלנו) |
 | `@hebcal/core` | נמשך אוטומטית (טרנזיטיבית) | מנוע חישוב הלוח העברי |
+| `@angular/cdk` | נמשך אוטומטית (peer) | ל-Overlay של ה-popup (צף מעל הכל, לא נחתך) |
 | `@angular/core` · `@angular/common` · `@angular/forms` | **אתם** מספקים (peer) | כבר קיימות בכל פרויקט Angular |
 
 בפועל: `npm i heb-date-picker` מספיק — אין תלויות שצריך להתקין ידנית. אין תלות

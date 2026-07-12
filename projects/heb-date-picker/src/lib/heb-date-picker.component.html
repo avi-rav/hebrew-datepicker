@@ -1,35 +1,15 @@
-@if (!inline()) {
-  <button
-    type="button"
-    class="hdp-field"
-    [class.hdp-field--empty]="!displayValue()"
-    [attr.aria-haspopup]="'dialog'"
-    [attr.aria-expanded]="open()"
-    [disabled]="disabled()"
-    (click)="toggleOpen()"
-  >
-    <span class="hdp-field__text">{{ displayValue() || placeholder() }}</span>
-    <svg class="hdp-field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-      <line x1="16" y1="2" x2="16" y2="6"></line>
-      <line x1="8" y1="2" x2="8" y2="6"></line>
-      <line x1="3" y1="10" x2="21" y2="10"></line>
-    </svg>
-  </button>
-}
-
-@if (inline() || open()) {
+<!-- The calendar panel — shared between inline mode and the popup overlay. -->
+<ng-template #panelTpl>
   <div
     class="hdp-panel"
     [class.hdp-panel--popup]="!inline()"
     role="dialog"
     aria-modal="false"
     [attr.aria-label]="monthView().title"
+    (keydown.escape)="onEscape()"
   >
     <div class="hdp-header">
-      <!-- Glyph direction always matches the action (‹/« = back, ›/» = forward),
-           independent of which side RTL flex places the group on. -->
+      <!-- Glyph direction always matches the action (‹/« = back, ›/» = forward). -->
       <div class="hdp-header__nav">
         <button type="button" class="hdp-nav-btn" (click)="prevYear()" aria-label="שנה קודמת" [disabled]="disabled()">«</button>
         <button type="button" class="hdp-nav-btn" (click)="prevMonth()" aria-label="חודש קודם" [disabled]="disabled()">‹</button>
@@ -59,4 +39,45 @@
       <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--today"></span>היום</span>
     </div>
   </div>
+</ng-template>
+
+@if (inline()) {
+  <ng-container [ngTemplateOutlet]="panelTpl" />
+} @else {
+  <button
+    type="button"
+    class="hdp-field"
+    cdkOverlayOrigin
+    #trigger="cdkOverlayOrigin"
+    [class.hdp-field--empty]="!displayValue()"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="open()"
+    [disabled]="disabled()"
+    (click)="toggleOpen()"
+  >
+    <span class="hdp-field__text">{{ displayValue() || placeholder() }}</span>
+    <svg class="hdp-field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg>
+  </button>
+
+  <!-- Popup panel is rendered in the CDK overlay (portaled to the body), so it
+       floats above everything and is never clipped by an ancestor's overflow. -->
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="open()"
+    [cdkConnectedOverlayPositions]="overlayPositions"
+    cdkConnectedOverlayPanelClass="hdp-overlay"
+    (overlayOutsideClick)="onOverlayOutsideClick($event)"
+    (detach)="open.set(false)"
+  >
+    <div class="heb-date-picker" dir="rtl">
+      <ng-container [ngTemplateOutlet]="panelTpl" />
+    </div>
+  </ng-template>
 }

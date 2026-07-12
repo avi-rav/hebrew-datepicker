@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { HebDatePickerComponent, type PickerValue } from './heb-date-picker.component';
 import type { HebRange } from 'heb-date-core';
 
@@ -131,5 +132,29 @@ describe('HebDatePickerComponent', () => {
       const text = el.querySelector('.hdp-field__text')!.textContent!.trim();
       expect(text).toBe('בחר תאריך');
     });
+
+    it('opens an overlay panel and navigates months without closing', () => {
+      const overlay = TestBed.inject(OverlayContainer).getContainerElement();
+      fixture.componentInstance.toggleOpen();
+      fixture.detectChanges();
+
+      const panel = () => overlay.querySelector('.hdp-panel');
+      expect(panel()).toBeTruthy(); // panel is portaled to the overlay container
+      const titleBefore = panel()!.querySelector('.hdp-header__title')!.textContent!.trim();
+
+      const next = overlay.querySelector<HTMLButtonElement>('[aria-label="חודש הבא"]')!;
+      next.click();
+      fixture.detectChanges();
+
+      // The panel is still open (regression guard) and moved to the next month.
+      expect(panel()).toBeTruthy();
+      const titleAfter = panel()!.querySelector('.hdp-header__title')!.textContent!.trim();
+      expect(titleAfter).not.toBe(titleBefore);
+
+      fixture.componentInstance.open.set(false);
+      fixture.detectChanges();
+    });
+
+    afterEach(() => TestBed.inject(OverlayContainer).ngOnDestroy());
   });
 });

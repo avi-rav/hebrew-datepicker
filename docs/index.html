@@ -348,8 +348,10 @@ HebPicker.prototype.render=function(){
 };
 HebPicker.prototype.bindPanel=function(root){
   var self=this;
-  root.querySelectorAll('[data-nav]').forEach(function(b){b.onclick=function(){self.nav(b.getAttribute('data-nav'));};});
-  root.querySelectorAll('.hdp-cell').forEach(function(b){b.onclick=function(){self.pick(parseInt(b.getAttribute('data-rd'),10),b);};});
+  // stopPropagation: a re-render detaches the clicked node, so without this the
+  // global outside-click handler would see a detached target and close the popup.
+  root.querySelectorAll('[data-nav]').forEach(function(b){b.onclick=function(e){e.stopPropagation();self.nav(b.getAttribute('data-nav'));};});
+  root.querySelectorAll('.hdp-cell').forEach(function(b){b.onclick=function(e){e.stopPropagation();self.pick(parseInt(b.getAttribute('data-rd'),10),b);};});
 };
 // Popup panel is portaled to <body> (position:fixed) so it floats above
 // everything and is never clipped by an ancestor's overflow.

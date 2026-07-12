@@ -14,6 +14,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { OverlayModule, type ConnectedPosition } from '@angular/cdk/overlay';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
   RangeSelectionModel,
@@ -55,13 +57,12 @@ export type PickerValue = Date | HebRange | null;
   selector: 'heb-date-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  imports: [HebCalendarMonthComponent],
+  imports: [HebCalendarMonthComponent, OverlayModule, NgTemplateOutlet],
   templateUrl: './heb-date-picker.component.html',
   styleUrl: './heb-date-picker.component.scss',
   host: {
     class: 'heb-date-picker',
     dir: 'rtl',
-    '(document:click)': 'onDocumentClick($event)',
     '(keydown.escape)': 'onEscape()',
   },
   providers: [
@@ -111,6 +112,12 @@ export class HebDatePickerComponent implements ControlValueAccessor {
   private readonly cvaDisabled = signal(false);
   /** Popup open state (always effectively open when `inline`). */
   readonly open = signal(false);
+
+  /** CDK overlay positions: below the field, flipping above if there's no room. */
+  readonly overlayPositions: ConnectedPosition[] = [
+    { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 6 },
+    { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -6 },
+  ];
 
   private onChange: (value: PickerValue) => void = () => {};
   private onTouched: () => void = () => {};
@@ -228,14 +235,16 @@ export class HebDatePickerComponent implements ControlValueAccessor {
     }
   }
 
-  onDocumentClick(event: MouseEvent): void {
-    if (this.inline() || !this.open()) {
+  /**
+   * The CDK overlay reports clicks outside the panel. The trigger button
+   * toggles itself, so ignore clicks on it to avoid an immediate re-open/close.
+   */
+  onOverlayOutsideClick(event: MouseEvent): void {
+    if (this.host.nativeElement.contains(event.target as Node)) {
       return;
     }
-    if (!this.host.nativeElement.contains(event.target as Node)) {
-      this.open.set(false);
-      this.onTouched();
-    }
+    this.open.set(false);
+    this.onTouched();
   }
 
   // ---- ControlValueAccessor -----------------------------------------------
