@@ -22,20 +22,20 @@
     [attr.aria-label]="monthView().title"
   >
     <div class="hdp-header">
-      <!-- RTL: this group renders on the right (moving back in time) -->
+      <!-- Glyph direction always matches the action (‹/« = back, ›/» = forward),
+           independent of which side RTL flex places the group on. -->
       <div class="hdp-header__nav">
-        <button type="button" class="hdp-nav-btn" (click)="prevYear()" aria-label="שנה קודמת" [disabled]="disabled()">»</button>
-        <button type="button" class="hdp-nav-btn" (click)="prevMonth()" aria-label="חודש קודם" [disabled]="disabled()">›</button>
+        <button type="button" class="hdp-nav-btn" (click)="prevYear()" aria-label="שנה קודמת" [disabled]="disabled()">«</button>
+        <button type="button" class="hdp-nav-btn" (click)="prevMonth()" aria-label="חודש קודם" [disabled]="disabled()">‹</button>
       </div>
 
       <button type="button" class="hdp-header__title" (click)="goToday()" title="חזרה להיום" [disabled]="disabled()">
         {{ monthView().title }}
       </button>
 
-      <!-- RTL: this group renders on the left (moving forward in time) -->
       <div class="hdp-header__nav">
-        <button type="button" class="hdp-nav-btn" (click)="nextMonth()" aria-label="חודש הבא" [disabled]="disabled()">‹</button>
-        <button type="button" class="hdp-nav-btn" (click)="nextYear()" aria-label="שנה הבאה" [disabled]="disabled()">«</button>
+        <button type="button" class="hdp-nav-btn" (click)="nextMonth()" aria-label="חודש הבא" [disabled]="disabled()">›</button>
+        <button type="button" class="hdp-nav-btn" (click)="nextYear()" aria-label="שנה הבאה" [disabled]="disabled()">»</button>
       </div>
     </div>
 
