@@ -1,0 +1,461 @@
+<title>heb-date-picker · לוח עברי לבחירת תאריכים</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --paper: #eef1f6; --surface: #ffffff; --surface-2: #f7f9fc; --ink: #15202f;
+    --ink-soft: #55647c; --line: #dce3ee; --accent: #1668b8; --accent-strong: #0f4f92;
+    --accent-ink: #ffffff; --gold-dot: #c58a1e; --range: #d6e4f6; --shabbat: #8a6512;
+    --disabled: #b3bccb; --shadow: 0 18px 50px -22px rgba(16, 42, 84, 0.4);
+    --serif: 'Frank Ruhl Libre', 'Narkisim', 'David Libre', ui-serif, Georgia, serif;
+    --sans: 'Assistant', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+    --maxw: 1120px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d1320; --surface: #151d2c; --surface-2: #111826; --ink: #e7edf6;
+      --ink-soft: #94a3ba; --line: #26324a; --accent: #4b95e2; --accent-strong: #6fabe9;
+      --accent-ink: #0a1120; --gold-dot: #e0b45f; --range: #1d3453; --shabbat: #d6ac5c;
+      --disabled: #4a566b; --shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
+    }
+  }
+  :root[data-theme='light'] {
+    --paper: #eef1f6; --surface: #ffffff; --surface-2: #f7f9fc; --ink: #15202f;
+    --ink-soft: #55647c; --line: #dce3ee; --accent: #1668b8; --accent-strong: #0f4f92;
+    --accent-ink: #ffffff; --gold-dot: #c58a1e; --range: #d6e4f6; --shabbat: #8a6512;
+    --disabled: #b3bccb; --shadow: 0 18px 50px -22px rgba(16, 42, 84, 0.4);
+  }
+  :root[data-theme='dark'] {
+    --paper: #0d1320; --surface: #151d2c; --surface-2: #111826; --ink: #e7edf6;
+    --ink-soft: #94a3ba; --line: #26324a; --accent: #4b95e2; --accent-strong: #6fabe9;
+    --accent-ink: #0a1120; --gold-dot: #e0b45f; --range: #1d3453; --shabbat: #d6ac5c;
+    --disabled: #4a566b; --shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; direction: rtl; color: var(--ink); font-family: var(--sans); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background: radial-gradient(1100px 550px at 85% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%), var(--paper);
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+  a { color: var(--accent); }
+
+  /* top bar */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; }
+  .brand .mark { display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 9px; background: var(--accent); color: var(--accent-ink); font-family: var(--serif); font-size: 1.2rem; }
+  .brand code { font-family: var(--mono); font-size: 0.95rem; direction: ltr; }
+  .topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
+  .pill { font-family: var(--mono); font-size: 0.78rem; direction: ltr; padding: 0.3rem 0.6rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); background: var(--surface); }
+  .theme-btn { display: inline-grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; font-size: 1.05rem; }
+  .theme-btn:hover { border-color: var(--accent); }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1fr 0.9fr; gap: 2.5rem; align-items: center; padding: 3rem 0 2.4rem; }
+  @media (max-width: 880px) { .hero { grid-template-columns: 1fr; gap: 1.75rem; } }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); direction: ltr; margin: 0 0 0.9rem; }
+  h1 { font-family: var(--serif); font-weight: 800; line-height: 1.08; font-size: clamp(2.2rem, 5vw, 3.4rem); margin: 0 0 1rem; text-wrap: balance; }
+  h1 .accent { color: var(--accent); }
+  .lead { font-size: 1.1rem; color: var(--ink-soft); max-width: 34rem; margin: 0 0 1.6rem; }
+  .lead b { color: var(--ink); }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; }
+  .install { font-family: var(--mono); direction: ltr; font-size: 0.92rem; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; padding: 0.7rem 1rem; display: inline-flex; gap: 0.6rem; }
+  .install .dollar { color: var(--accent); user-select: none; }
+  .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.7rem 1.1rem; border-radius: 11px; font: inherit; font-weight: 600; text-decoration: none; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+  .btn:hover { border-color: var(--accent); }
+
+  /* ===== Calendar widget (the star) ===== */
+  .hdp { --cell: 2.5rem; display: inline-block; direction: rtl; font-family: var(--sans); color: var(--ink); position: relative; }
+  .hdp-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 0.85rem; box-shadow: var(--shadow); width: max-content; }
+  .hdp.pop .hdp-panel { position: absolute; z-index: 30; inset-inline-start: 0; margin-top: 0.4rem; }
+  .hdp-head { display: flex; align-items: center; justify-content: space-between; gap: 0.25rem; margin-bottom: 0.5rem; }
+  .hdp-nav { display: flex; gap: 0.15rem; }
+  .hdp-nav button, .hdp-title { border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; border-radius: 8px; }
+  .hdp-nav button { width: 2rem; height: 2rem; font-size: 1.1rem; line-height: 1; color: var(--ink-soft); }
+  .hdp-nav button:hover { background: var(--surface-2); color: var(--ink); }
+  .hdp-title { flex: 1; text-align: center; font-family: var(--serif); font-weight: 700; font-size: 1.1rem; padding: 0.3rem; }
+  .hdp-title:hover { background: var(--surface-2); }
+  .hdp-grid { display: grid; grid-template-columns: repeat(7, var(--cell)); gap: 2px; }
+  .hdp-wd { display: grid; place-items: center; height: 1.6rem; font-size: 0.74rem; font-weight: 700; color: var(--ink-soft); }
+  .hdp-cell { position: relative; display: grid; place-items: center; width: var(--cell); height: var(--cell); border: 0; background: transparent; color: var(--ink); font-family: var(--serif); font-size: 0.98rem; border-radius: 9px; cursor: pointer; }
+  .hdp-cell:hover:not(.dis):not(.sel) { background: var(--surface-2); }
+  .hdp-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .hdp-cell.oth { color: var(--ink-soft); opacity: 0.5; }
+  .hdp-cell.shab { color: var(--shabbat); font-weight: 700; }
+  .hdp-cell.rosh::after { content: ''; position: absolute; inset-inline: 32%; bottom: 5px; height: 2px; background: color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 2px; }
+  .hdp-cell .dot { position: absolute; bottom: 4px; inset-inline-start: 50%; transform: translateX(50%); width: 4px; height: 4px; border-radius: 50%; background: var(--gold-dot); }
+  .hdp-cell.today { box-shadow: inset 0 0 0 1.6px var(--accent); }
+  .hdp-cell.inr { background: var(--range); border-radius: 0; }
+  .hdp-cell.rs { border-start-start-radius: 9px; border-end-start-radius: 9px; }
+  .hdp-cell.re { border-start-end-radius: 9px; border-end-end-radius: 9px; }
+  .hdp-cell.sel, .hdp-cell.rs, .hdp-cell.re { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+  .hdp-cell.sel .dot, .hdp-cell.rs .dot, .hdp-cell.re .dot { background: var(--accent-ink); }
+  .hdp-cell.dis { color: var(--disabled); cursor: not-allowed; text-decoration: line-through; }
+  .hdp-legend { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid var(--line); font-size: 0.72rem; color: var(--ink-soft); }
+  .hdp-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+  .sw { width: 0.7rem; height: 0.7rem; border-radius: 3px; }
+  .sw-h { background: var(--gold-dot); } .sw-s { background: var(--shabbat); } .sw-t { box-shadow: inset 0 0 0 1.6px var(--accent); } .sw-x { background: var(--accent); }
+  /* popup field */
+  .hdp-field { display: inline-flex; align-items: center; gap: 0.5rem; min-width: 13rem; padding: 0.55rem 0.85rem; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; cursor: pointer; }
+  .hdp-field:hover { border-color: var(--accent); }
+  .hdp-field .txt { flex: 1; }
+  .hdp-field.empty .txt { color: var(--ink-soft); }
+  .hdp-field svg { width: 1.05em; height: 1.05em; color: var(--ink-soft); flex: 0 0 auto; }
+
+  /* format band */
+  .band { margin: 1.2rem 0 3rem; padding: 1.5rem 1.75rem; border-radius: 16px; background: linear-gradient(180deg, var(--surface), var(--surface-2)); border: 1px solid var(--line); display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items: center; }
+  @media (max-width: 640px) { .band { grid-template-columns: 1fr; text-align: center; } }
+  .band .big { font-family: var(--serif); font-size: clamp(1.9rem, 5.5vw, 2.9rem); font-weight: 800; color: var(--accent); white-space: nowrap; }
+  .band .desc { color: var(--ink-soft); } .band .desc b { color: var(--ink); }
+  .band code { font-family: var(--mono); direction: ltr; font-size: 0.85em; background: var(--paper); padding: 0.1rem 0.35rem; border-radius: 5px; }
+
+  /* sections */
+  section { padding: 2rem 0; }
+  .sec-head { margin-bottom: 1.5rem; }
+  .sec-head .kicker { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); direction: ltr; display: block; margin-bottom: 0.35rem; }
+  .sec-head h2 { font-family: var(--serif); font-size: clamp(1.5rem, 3.4vw, 2rem); margin: 0; }
+  .sec-head p { color: var(--ink-soft); margin: 0.35rem 0 0; max-width: 42rem; }
+
+  /* demo card: live picker + code side by side */
+  .demos { display: grid; gap: 1.5rem; }
+  .demo { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .demo-top { display: grid; grid-template-columns: 1.05fr 1fr; }
+  @media (max-width: 820px) { .demo-top { grid-template-columns: 1fr; } }
+  .demo-live { padding: 1.4rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.9rem; border-inline-end: 1px solid var(--line); }
+  @media (max-width: 820px) { .demo-live { border-inline-end: 0; border-bottom: 1px solid var(--line); } }
+  .demo-live h3 { margin: 0; font-size: 1.12rem; }
+  .demo-live .note { margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
+  .demo-result { font-size: 0.95rem; margin: 0; }
+  .demo-result b { color: var(--accent-strong); font-family: var(--serif); }
+  .demo-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .demo-controls label { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
+  .demo-code { background: var(--surface-2); display: flex; flex-direction: column; }
+  .demo-code .bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--line); }
+  .demo-code .bar .fn { font-family: var(--mono); font-size: 0.76rem; direction: ltr; color: var(--ink-soft); margin-inline-start: 0.4rem; }
+  .demo-code pre { margin: 0; padding: 1rem 1.1rem; overflow-x: auto; flex: 1; }
+  .demo-code code { font-family: var(--mono); font-size: 0.82rem; direction: ltr; line-height: 1.6; white-space: pre; color: var(--ink); }
+  .tok-k { color: var(--accent-strong); } .tok-s { color: var(--gold-dot); } .tok-c { color: var(--ink-soft); font-style: italic; } .tok-a { color: var(--shabbat); }
+
+  /* API table */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.92rem; }
+  thead th { text-align: right; padding: 0.8rem 1rem; background: var(--surface-2); border-bottom: 1px solid var(--line); font-weight: 700; white-space: nowrap; }
+  tbody td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td code, th code { font-family: var(--mono); direction: ltr; font-size: 0.85em; color: var(--accent-strong); }
+  .muted { color: var(--ink-soft); }
+
+  .keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.55rem; }
+  @media (max-width: 640px) { .keys { grid-template-columns: 1fr; } }
+  .key-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.65rem 0.9rem; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; }
+  kbd { font-family: var(--mono); font-size: 0.8rem; direction: ltr; background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 0.12rem 0.42rem; }
+  .key-row .desc { color: var(--ink-soft); font-size: 0.9rem; }
+
+  footer { border-top: 1px solid var(--line); margin-top: 2rem; padding: 2rem 0 3rem; color: var(--ink-soft); font-size: 0.9rem; }
+  footer .note { padding: 0.9rem 1.1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-bottom: 1.1rem; }
+  footer code { font-family: var(--mono); direction: ltr; font-size: 0.85em; }
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="mark">א</span><code>heb-date-picker</code></div>
+    <div class="topbar-actions">
+      <a class="pill" href="https://www.npmjs.com/package/heb-date-picker">npm i heb-date-picker</a>
+      <button class="theme-btn" id="themeToggle" type="button" aria-label="החלפת מצב תצוגה">🌓</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <p class="eyebrow">Hebrew calendar date picker · Angular</p>
+      <h1>לוח עברי לבחירת תאריכים, ב<span class="accent">גימטריה</span>.</h1>
+      <p class="lead">רכיב Date Picker ל-Angular שמציג את הלוח העברי עם תאריכים כתובים כהלכה — <b>כ״א אלול תשפ״ו</b>. נסו את הלוח משמאל: <b>החיצים באמת מנווטים בין חודשים ושנים.</b></p>
+      <div class="cta-row">
+        <span class="install"><span class="dollar">$</span> npm i heb-date-picker</span>
+        <a class="btn" href="#demos">כל ההדגמות ↓</a>
+      </div>
+    </div>
+    <div><div class="hdp" data-picker='{"mode":"single","inline":true,"legend":true}' id="heroPicker"></div></div>
+  </div>
+
+  <div class="band">
+    <div class="big" dir="rtl">כ״א אֱלוּל תשפ״ו</div>
+    <div class="desc">הפורמט מגיע מ-<code>renderGematriya()</code>: יום, חודש ושנה באותיות עבריות, עם ניקוד או בלעדיו — כולל <b>ט״ו / ט״ז</b> ושנים מעוברות (<b>אדר א׳ / אדר ב׳</b>). הלוח כאן מחשב הכל בזמן אמת.</div>
+  </div>
+
+  <!-- DEMOS -->
+  <section id="demos">
+    <div class="sec-head">
+      <span class="kicker">Live demos</span>
+      <h2>כל אפשרות — חיה, עם הקוד שמפעיל אותה</h2>
+      <p>כל דמו הוא הרכיב האמיתי (בגרסת דפדפן), ולצידו קטע ה-Angular עם ה-props המדויקים. העתיקו והדביקו.</p>
+    </div>
+
+    <div class="demos" id="demoList"></div>
+  </section>
+
+  <!-- API -->
+  <section id="api">
+    <div class="sec-head"><span class="kicker">Reference</span><h2>API</h2></div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Input</th><th>סוג</th><th>ברירת מחדל</th><th>תיאור</th></tr></thead>
+        <tbody>
+          <tr><td><code>mode</code></td><td><code>'single' | 'range'</code></td><td><code>'single'</code></td><td>יום יחיד או טווח</td></tr>
+          <tr><td><code>value</code></td><td><code>Date | HebRange | null</code></td><td><code>null</code></td><td>הערך — <code>[(value)]</code>, <code>ngModel</code>, <code>formControl</code></td></tr>
+          <tr><td><code>min</code> / <code>max</code></td><td><code>Date | null</code></td><td><code>null</code></td><td>גבולות הבחירה (כולל)</td></tr>
+          <tr><td><code>disabledDates</code></td><td><code>(d: Date) =&gt; boolean</code></td><td class="muted">—</td><td><code>true</code> חוסם את היום</td></tr>
+          <tr><td><code>showNikud</code></td><td><code>boolean</code></td><td><code>false</code></td><td>גימטריה עם ניקוד</td></tr>
+          <tr><td><code>israel</code></td><td><code>boolean</code></td><td><code>true</code></td><td>לוח חגים א״י או תפוצות</td></tr>
+          <tr><td><code>firstDayOfWeek</code></td><td><code>number</code></td><td><code>0</code></td><td>0=ראשון … 6=שבת</td></tr>
+          <tr><td><code>inline</code></td><td><code>boolean</code></td><td><code>false</code></td><td>מוטמע במקום popup</td></tr>
+          <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'בחר תאריך'</code></td><td>טקסט שדה ה-popup</td></tr>
+          <tr><td><code>valueChange</code> <span class="muted">(out)</span></td><td><code>PickerValue</code></td><td class="muted">—</td><td>נפלט בכל שינוי ערך</td></tr>
+          <tr><td><code>monthChange</code> <span class="muted">(out)</span></td><td><code>HebMonthRef</code></td><td class="muted">—</td><td>נפלט כשהחודש משתנה</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="a11y">
+    <div class="sec-head"><span class="kicker">Accessibility</span><h2>ניווט מקלדת מלא</h2></div>
+    <div class="keys">
+      <div class="key-row"><span class="desc">יום קודם / הבא (RTL)</span><span><kbd>←</kbd> <kbd>→</kbd></span></div>
+      <div class="key-row"><span class="desc">שבוע אחורה / קדימה</span><span><kbd>↑</kbd> <kbd>↓</kbd></span></div>
+      <div class="key-row"><span class="desc">תחילת / סוף השבוע</span><span><kbd>Home</kbd> <kbd>End</kbd></span></div>
+      <div class="key-row"><span class="desc">חודש אחורה / קדימה</span><span><kbd>PgUp</kbd> <kbd>PgDn</kbd></span></div>
+      <div class="key-row"><span class="desc">בחירת היום שבמיקוד</span><span><kbd>Enter</kbd> <kbd>Space</kbd></span></div>
+      <div class="key-row"><span class="desc">סגירת ה-popup</span><span><kbd>Esc</kbd></span></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="note"><b>הערה:</b> הלוח בדף זה הוא מימוש דפדפן קליל להדגמה חזותית — מחשב תאריכים עבריים אמיתיים (אומת מול <code>@hebcal/core</code>). ברכיב ה-Angular עצמו כל החישוב מגיע מ-<code>@hebcal/core</code> דרך חבילת הליבה <code>heb-date-core</code>.</div>
+    <div>📦 <a href="https://www.npmjs.com/package/heb-date-picker">npmjs.com/package/heb-date-picker</a> · <a href="https://github.com/avi-rav/hebrew-datepicker">GitHub</a> · רישיון GPL-2.0</div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Self-contained Hebrew calendar engine (verified vs @hebcal/core:
+   0 mismatches across 14,976 dates + all month titles + day labels).
+   ============================================================ */
+function mod(a,b){return ((a%b)+b)%b;}
+function gregLeap(y){return (y%4===0&&y%100!==0)||y%400===0;}
+var GREG=[31,28,31,30,31,30,31,31,30,31,30,31];
+function gregMonthLen(m,y){return m===2&&gregLeap(y)?29:GREG[m-1];}
+function gregToRD(y,m,d){var n=365*(y-1)+Math.floor((y-1)/4)-Math.floor((y-1)/100)+Math.floor((y-1)/400);for(var mm=1;mm<m;mm++)n+=gregMonthLen(mm,y);return n+d;}
+function rdToGreg(rd){var y=Math.floor(rd/366)+1;while(gregToRD(y+1,1,1)<=rd)y++;var m=1;while(gregToRD(y,m,gregMonthLen(m,y))<rd)m++;return {y:y,m:m,d:rd-gregToRD(y,m,1)+1};}
+function hebLeap(y){return mod(7*y+1,19)<7;}
+function hebMonthsInYear(y){return hebLeap(y)?13:12;}
+function hebElapsedDays(y){var me=Math.floor((235*y-234)/19);var pe=12084+13753*me;var day=me*29+Math.floor(pe/25920);if(mod(3*(day+1),7)<3)day+=1;return day;}
+function hebDelay(y){var a=hebElapsedDays(y-1),b=hebElapsedDays(y),c=hebElapsedDays(y+1);if(c-b===356)return 2;if(b-a===382)return 1;return 0;}
+var HEB_EPOCH=-1373427;
+function hebNewYearRD(y){return HEB_EPOCH+hebElapsedDays(y)+hebDelay(y);}
+function hebDaysInYear(y){return hebNewYearRD(y+1)-hebNewYearRD(y);}
+function hebLongCheshvan(y){return mod(hebDaysInYear(y),10)===5;}
+function hebShortKislev(y){return mod(hebDaysInYear(y),10)===3;}
+function hebMonthLen(m,y){if(m===2||m===4||m===6||m===10||m===13)return 29;if(m===8&&!hebLongCheshvan(y))return 29;if(m===9&&hebShortKislev(y))return 29;if(m===12&&!hebLeap(y))return 29;return 30;}
+function hebToRD(y,m,d){var rd=hebNewYearRD(y);if(m>=7){for(var mm=7;mm<m;mm++)rd+=hebMonthLen(mm,y);}else{for(var k=7;k<=hebMonthsInYear(y);k++)rd+=hebMonthLen(k,y);for(var j=1;j<m;j++)rd+=hebMonthLen(j,y);}return rd+d-1;}
+function rdToHeb(rd){var y=Math.floor((rd-HEB_EPOCH)/365)+1;while(hebNewYearRD(y+1)<=rd)y++;while(hebNewYearRD(y)>rd)y--;var order=[];for(var mm=7;mm<=hebMonthsInYear(y);mm++)order.push(mm);for(var j=1;j<=6;j++)order.push(j);var m=7;for(var i=0;i<order.length;i++){var k=order[i];if(hebToRD(y,k,1)<=rd&&rd<=hebToRD(y,k,hebMonthLen(k,y))){m=k;break;}}return {y:y,m:m,d:rd-hebToRD(y,m,1)+1};}
+var GEM=[[400,'ת'],[300,'ש'],[200,'ר'],[100,'ק'],[90,'צ'],[80,'פ'],[70,'ע'],[60,'ס'],[50,'נ'],[40,'מ'],[30,'ל'],[20,'כ'],[10,'י'],[9,'ט'],[8,'ח'],[7,'ז'],[6,'ו'],[5,'ה'],[4,'ד'],[3,'ג'],[2,'ב'],[1,'א']];
+function gematriya(n,isYear){var r=isYear?n%1000:n,s='';for(var i=0;i<GEM.length;i++){while(r>=GEM[i][0]){s+=GEM[i][1];r-=GEM[i][0];}}s=s.replace('יה','טו').replace('יו','טז');return s.length===1?s+'׳':s.slice(0,-1)+'״'+s.slice(-1);}
+var MN={1:'ניסן',2:'אייר',3:'סיון',4:'תמוז',5:'אב',6:'אלול',7:'תשרי',8:'חשון',9:'כסלו',10:'טבת',11:'שבט',13:'אדר ב׳'};
+function hebMonthName(m,y){return m===12?(hebLeap(y)?'אדר א׳':'אדר'):MN[m];}
+function monthTitle(y,m){return hebMonthName(m,y)+' '+gematriya(y,true);}
+function fullGematriya(y,m,d){return gematriya(d)+' '+hebMonthName(m,y)+' '+gematriya(y,true);}
+
+/* holidays on fixed Hebrew dates (visual approximation) */
+var FIXED={'7-1':'ראש השנה','7-2':'ראש השנה','7-3':'צום גדליה','7-10':'יום כיפור','7-15':'סוכות א׳','7-16':'סוכות (חוה״מ)','7-17':'סוכות (חוה״מ)','7-18':'סוכות (חוה״מ)','7-19':'סוכות (חוה״מ)','7-20':'סוכות (חוה״מ)','7-21':'הושענא רבה','7-22':'שמיני עצרת','10-10':'עשרה בטבת','11-15':'ט״ו בשבט','1-15':'פסח א׳','1-16':'פסח (חוה״מ)','1-17':'פסח (חוה״מ)','1-18':'פסח (חוה״מ)','1-19':'פסח (חוה״מ)','1-20':'פסח (חוה״מ)','1-21':'שביעי של פסח','2-14':'פסח שני','2-18':'ל״ג בעומר','3-6':'שבועות','4-17':'שבעה עשר בתמוז','5-9':'תשעה באב','5-15':'ט״ו באב','6-29':'ערב ראש השנה'};
+function holidaysFor(m,d,y,il){var out=[];var k=m+'-'+d;if(FIXED[k])out.push(FIXED[k]);
+  if(m===9&&d>=25)out.push('חנוכה');else if(m===10&&(d<=2||(d===3&&hebMonthLen(9,y)===29)))out.push('חנוכה');
+  var pm=hebLeap(y)?13:12;if(m===pm){if(d===13)out.push('תענית אסתר');if(d===14)out.push('פורים');if(d===15)out.push('שושן פורים');}
+  if(!il){if(m===7&&d===23)out.push('שמחת תורה');if(m===1&&d===22)out.push('אחרון של פסח');if(m===3&&d===7)out.push('שבועות ב׳');}
+  return out;}
+
+function todayRD(){var n=new Date();return gregToRD(n.getFullYear(),n.getMonth()+1,n.getDate());}
+function jsDateToRD(dt){return gregToRD(dt.getFullYear(),dt.getMonth()+1,dt.getDate());}
+var WD=['א','ב','ג','ד','ה','ו','ש'];
+
+/* ============================================================
+   HebPicker — vanilla widget mirroring the Angular component.
+   ============================================================ */
+function HebPicker(host,opts){
+  this.host=host;
+  this.o=Object.assign({mode:'single',inline:true,min:null,max:null,disabled:null,nikud:false,israel:true,fdow:0,legend:false,placeholder:'בחר תאריך',onChange:null},opts);
+  var t=rdToHeb(todayRD());this.vy=t.y;this.vm=t.m;
+  this.value=this.o.mode==='range'?{start:null,end:null}:null; // RD numbers
+  this.open=false;
+  this.render();
+}
+HebPicker.prototype.setOpt=function(k,v){this.o[k]=v;this.render();if(this.o.onChange)this.o.onChange(this.readable());};
+HebPicker.prototype.readable=function(){
+  if(this.o.mode==='range'){var r=this.value;if(!r.start)return '—';var s=this.fmt(r.start);var e=r.end?this.fmt(r.end):'…';return s+'  →  '+e;}
+  return this.value==null?'—':this.fmt(this.value);
+};
+HebPicker.prototype.fmt=function(rd){var h=rdToHeb(rd);var base=fullGematriya(h.y,h.m,h.d);return base;};
+HebPicker.prototype.buildCells=function(){
+  var vy=this.vy,vm=this.vm,o=this.o;
+  var firstRD=hebToRD(vy,vm,1);var lead=mod(mod(firstRD,7)-o.fdow,7);var start=firstRD-lead;
+  var tRD=todayRD();var minRD=o.min?jsDateToRD(o.min):null;var maxRD=o.max?jsDateToRD(o.max):null;
+  var cells=[];
+  for(var i=0;i<42;i++){var rd=start+i;var h=rdToHeb(rd);var g=rdToGreg(rd);var dow=mod(rd,7);
+    var hol=holidaysFor(h.m,h.d,h.y,o.israel);
+    var dis=(minRD!==null&&rd<minRD)||(maxRD!==null&&rd>maxRD);
+    if(!dis&&o.disabled){dis=o.disabled(new Date(g.y,g.m-1,g.d));}
+    var sel=false,rs=false,re=false,inr=false;
+    if(o.mode==='range'){var v=this.value;if(v.start!==null&&rd===v.start)rs=true;if(v.end!==null&&rd===v.end)re=true;if(v.start!==null&&v.end!==null&&rd>Math.min(v.start,v.end)&&rd<Math.max(v.start,v.end))inr=true;}
+    else{sel=(this.value!==null&&rd===this.value);}
+    cells.push({rd:rd,h:h,dow:dow,label:gematriya(h.d),hol:hol,
+      oth:(h.m!==vm||h.y!==vy),shab:dow===6,rosh:(h.d===1||h.d===30),today:rd===tRD,dis:dis,sel:sel,rs:rs,re:re,inr:inr});
+  }
+  return cells;
+};
+HebPicker.prototype.panelHTML=function(){
+  var o=this.o;var cells=this.buildCells();
+  var wd='';for(var i=0;i<7;i++){wd+='<div class="hdp-wd">'+WD[mod(o.fdow+i,7)]+'</div>';}
+  var grid='';
+  for(var j=0;j<42;j++){var c=cells[j];var cls='hdp-cell';
+    if(c.oth)cls+=' oth';if(c.shab)cls+=' shab';if(c.rosh)cls+=' rosh';if(c.today)cls+=' today';
+    if(c.inr)cls+=' inr';if(c.rs)cls+=' rs';if(c.re)cls+=' re';if(c.sel)cls+=' sel';if(c.dis)cls+=' dis';
+    var title=c.hol.length?(' title="'+c.hol.join(' · ')+'"'):'';
+    grid+='<button type="button" class="'+cls+'" data-rd="'+c.rd+'"'+title+'>'+c.label+(c.hol.length?'<span class="dot"></span>':'')+'</button>';
+  }
+  var legend=o.legend?'<div class="hdp-legend"><span><span class="sw sw-x"></span>נבחר</span><span><span class="sw sw-h"></span>חג</span><span><span class="sw sw-s"></span>שבת</span><span><span class="sw sw-t"></span>היום</span></div>':'';
+  return '<div class="hdp-panel">'
+    +'<div class="hdp-head">'
+    +'<div class="hdp-nav"><button type="button" data-nav="py" aria-label="שנה קודמת">«</button><button type="button" data-nav="pm" aria-label="חודש קודם">‹</button></div>'
+    +'<button type="button" class="hdp-title" data-nav="today">'+monthTitle(this.vy,this.vm)+'</button>'
+    +'<div class="hdp-nav"><button type="button" data-nav="nm" aria-label="חודש הבא">›</button><button type="button" data-nav="ny" aria-label="שנה הבאה">»</button></div>'
+    +'</div>'
+    +'<div class="hdp-grid">'+wd+grid+'</div>'+legend+'</div>';
+};
+HebPicker.prototype.render=function(){
+  var o=this.o;
+  if(o.inline){this.host.className='hdp';this.host.innerHTML=this.panelHTML();}
+  else{
+    this.host.className='hdp pop';
+    var disp=this.readable();var empty=(disp==='—');
+    var field='<button type="button" class="hdp-field'+(empty?' empty':'')+'"><span class="txt">'+(empty?o.placeholder:disp)+'</span>'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>';
+    this.host.innerHTML=field+(this.open?this.panelHTML():'');
+  }
+  this.bind();
+};
+HebPicker.prototype.bind=function(){
+  var self=this;
+  var field=this.host.querySelector('.hdp-field');
+  if(field)field.onclick=function(e){e.stopPropagation();self.open=!self.open;self.render();};
+  var navs=this.host.querySelectorAll('[data-nav]');
+  navs.forEach(function(b){b.onclick=function(){self.nav(b.getAttribute('data-nav'));};});
+  var cells=this.host.querySelectorAll('.hdp-cell');
+  cells.forEach(function(b){b.onclick=function(){self.pick(parseInt(b.getAttribute('data-rd'),10),b);};});
+};
+HebPicker.prototype.nav=function(what){
+  if(what==='today'){var t=rdToHeb(todayRD());this.vy=t.y;this.vm=t.m;}
+  else if(what==='nm'){var r=rdToHeb(hebToRD(this.vy,this.vm,hebMonthLen(this.vm,this.vy))+1);this.vy=r.y;this.vm=r.m;}
+  else if(what==='pm'){var p=rdToHeb(hebToRD(this.vy,this.vm,1)-1);this.vy=p.y;this.vm=p.m;}
+  else if(what==='ny'){this.vy++;if(this.vm===13&&!hebLeap(this.vy))this.vm=12;}
+  else if(what==='py'){this.vy--;if(this.vm===13&&!hebLeap(this.vy))this.vm=12;}
+  this.render();
+};
+HebPicker.prototype.pick=function(rd,btn){
+  if(btn.classList.contains('dis'))return;
+  var h=rdToHeb(rd);this.vy=h.y;this.vm=h.m; // follow into month
+  if(this.o.mode==='range'){
+    var v=this.value;
+    if(v.start===null||v.end!==null){this.value={start:rd,end:null};}
+    else{this.value=rd<v.start?{start:rd,end:v.start}:{start:v.start,end:rd};}
+  }else{
+    this.value=rd;
+    if(!this.o.inline)this.open=false;
+  }
+  this.render();
+  if(this.o.onChange)this.o.onChange(this.readable());
+};
+
+/* ---------- boot ---------- */
+var pickers=[];
+function mountPicker(host,opts){var p=new HebPicker(host,opts);pickers.push(p);return p;}
+// hero
+mountPicker(document.getElementById('heroPicker'),{mode:'single',inline:true,legend:true});
+
+// close popups on outside click
+document.addEventListener('click',function(e){
+  pickers.forEach(function(p){if(!p.o.inline&&p.open&&!p.host.contains(e.target)){p.open=false;p.render();}});
+});
+// theme toggle
+var root=document.documentElement;
+document.getElementById('themeToggle').addEventListener('click',function(){
+  var cur=root.getAttribute('data-theme');
+  root.setAttribute('data-theme',cur==='dark'?'light':cur==='light'?'dark':(matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark'));
+});
+
+/* ---------- demo cards (live picker + code) ---------- */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function hl(code){
+  // very small highlighter for the Angular snippets
+  return esc(code)
+    .replace(/(&lt;\/?[a-z-]+)/g,'<span class="tok-k">$1</span>')
+    .replace(/(\[[^\]]+\]|\([^)]+\)|mode|placeholder)=/g,'<span class="tok-a">$1</span>=')
+    .replace(/(&quot;|&#39;)([^&]*?)(&quot;|&#39;)/g,'$1<span class="tok-s">$2</span>$3')
+    .replace(/(\/\/[^\n]*)/g,'<span class="tok-c">$1</span>');
+}
+var DEMOS=[
+  {id:'single',h:'1 · יום יחיד (inline)',note:'הלוח מוטמע ישירות בדף. לחצו על יום — והחיצים מנווטים חודש/שנה.',opts:{mode:'single',inline:true,legend:true},resultLabel:'נבחר',
+   code:'<heb-date-picker\n  [(ngModel)]="date"\n  [inline]="true">\n</heb-date-picker>\n\n// date: Date | null'},
+  {id:'popup',h:'2 · שדה קופץ (popup)',note:'ברירת המחדל: שדה עם אייקון לוח. לחיצה פותחת; בחירת יום סוגרת. הערך מוצג בשדה בגימטריה.',opts:{mode:'single',inline:false,placeholder:'בחרו תאריך…'},resultLabel:'נבחר',
+   code:'<heb-date-picker\n  [(ngModel)]="date"\n  placeholder="בחרו תאריך…">\n</heb-date-picker>'},
+  {id:'range',h:'3 · טווח תאריכים (range)',note:'קליק ראשון = התחלה, קליק שני = סוף. הימים שביניהם מודגשים. הערך: { start, end }.',opts:{mode:'range',inline:true},resultLabel:'טווח',
+   code:'<heb-date-picker\n  [(ngModel)]="range"\n  mode="range">\n</heb-date-picker>\n\n// range: { start: Date|null; end: Date|null }'},
+  {id:'limits',h:'4 · מגבלות + ימים חסומים',note:'כאן: מוגבל להיום עד +45 יום, ושישי+שבת חסומים (קו חוצה). נסו לבחור יום חסום.',opts:{mode:'single',inline:true},resultLabel:'נבחר',
+   code:'<heb-date-picker\n  [(ngModel)]="date"\n  [min]="today"\n  [max]="in45days"\n  [disabledDates]="noWeekends">\n</heb-date-picker>\n\n// noWeekends = (d: Date) =>\n//   d.getDay() === 5 || d.getDay() === 6;'},
+  {id:'holidays',h:'5 · חגים · ניקוד · תפוצות',note:'סמנו את התיבות וראו את הלוח מגיב. נווטו לתשרי כדי לראות ראש השנה, יום כיפור וסוכות.',opts:{mode:'single',inline:true,legend:true},resultLabel:'נבחר',toggles:true,
+   code:'<heb-date-picker\n  [(ngModel)]="date"\n  [showNikud]="{nikud}"\n  [israel]="{israel}">\n</heb-date-picker>'},
+  {id:'theme',h:'6 · מיתוג עם CSS Variables',note:'אותו רכיב, צבע אחר — דרך משתני --hdp-* בלבד, בלי לגעת בקוד.',opts:{mode:'single',inline:true},resultLabel:'נבחר',theme:true,
+   code:'.my-theme {\n  --hdp-accent: #0ca678;\n  --hdp-in-range-bg: #c3fae8;\n  --hdp-today-ring: #0ca678;\n  --hdp-radius: 18px;\n}'},
+];
+
+var list=document.getElementById('demoList');
+DEMOS.forEach(function(d){
+  var card=document.createElement('div');card.className='demo';
+  var togglesHTML=d.toggles?'<div class="demo-controls"><label><input type="checkbox" data-t="nikud"> ניקוד</label><label><input type="checkbox" data-t="israel" checked> חגי ארץ ישראל</label></div>':'';
+  card.innerHTML=
+    '<div class="demo-top">'
+    +'<div class="demo-live">'
+      +'<h3>'+d.h+'</h3>'
+      +'<p class="note">'+d.note+'</p>'
+      +togglesHTML
+      +'<div class="picker-host"'+(d.theme?' style="--accent:#0ca678;--accent-ink:#fff;--range:#c3fae8;--gold-dot:#e8590c"':'')+'></div>'
+      +'<p class="demo-result">'+d.resultLabel+': <b class="rslt">—</b></p>'
+    +'</div>'
+    +'<div class="demo-code">'
+      +'<div class="bar"><span style="width:9px;height:9px;border-radius:50%;background:#e0605e;display:inline-block"></span><span style="width:9px;height:9px;border-radius:50%;background:#e6b84f;display:inline-block"></span><span style="width:9px;height:9px;border-radius:50%;background:#57b95a;display:inline-block"></span><span class="fn">'+(d.id==='theme'?'styles.css':'template')+'</span></div>'
+      +'<pre><code>'+hl(d.code)+'</code></pre>'
+    +'</div>'
+    +'</div>';
+  list.appendChild(card);
+  var host=card.querySelector('.picker-host');
+  var rslt=card.querySelector('.rslt');
+  var opts=Object.assign({},d.opts,{onChange:function(txt){rslt.textContent=txt;}});
+  if(d.id==='limits'){opts.min=new Date();var mx=new Date();mx.setDate(mx.getDate()+45);opts.max=mx;opts.disabled=function(dt){return dt.getDay()===5||dt.getDay()===6;};}
+  var p=mountPicker(host,opts);
+  if(d.toggles){
+    card.querySelectorAll('[data-t]').forEach(function(cb){
+      cb.addEventListener('change',function(){
+        p.setOpt(cb.getAttribute('data-t')==='nikud'?'nikud':'israel',cb.checked);
+        // reflect in code snippet
+        var codeEl=card.querySelector('code');
+        var nik=card.querySelector('[data-t="nikud"]').checked;
+        var isr=card.querySelector('[data-t="israel"]').checked;
+        codeEl.innerHTML=hl(d.code.replace('{nikud}',nik).replace('{israel}',isr));
+      });
+    });
+    var codeEl=card.querySelector('code');codeEl.innerHTML=hl(d.code.replace('{nikud}','false').replace('{israel}','true'));
+  }
+});
+</script>

@@ -1,9 +1,13 @@
 # heb-date-picker · monorepo
 
-לוח שנה / Date Picker **עברי** עם תאריכי גימטריה (`כ״א אלול תשפ״ו`) ל-Angular.
+לוח שנה / Date Picker **עברי** עם תאריכי עברי (`כ״א אלול תשפ״ו`) ל-Angular.
 
 📦 npm: [`heb-date-picker`](https://www.npmjs.com/package/heb-date-picker) ·
-🌐 [דמו חי](https://claude.ai/code/artifact/c5ef5418-2ec4-445e-817d-6d5cdb3160f6)
+🌐 [דמו חי אינטראקטיבי](https://claude.ai/code/artifact/c5ef5418-2ec4-445e-817d-6d5cdb3160f6)
+(המקור: [`docs/index.html`](docs/index.html))
+
+> **GitHub Pages:** אפשר לארח את הדמו ישירות מה-repo — Settings → Pages → Source:
+> `main` / תיקיית `/docs`. אז הדף יהיה זמין ב-`https://avi-rav.github.io/hebrew-datepicker/`.
 
 זהו ה-workspace לפיתוח. אם הגעתם לכאן כדי **להשתמש** בחבילה בפרויקט Angular שלכם
 (`npm i heb-date-picker`), כל ההוראות — התקנה, דוגמאות שימוש, ו-API מלא — נמצאות
