@@ -74,8 +74,10 @@
   color: var(--hdp-muted);
 }
 .hdp-field__icon {
+  flex: 0 0 auto;
+  width: 1.05em;
+  height: 1.05em;
   color: var(--hdp-muted);
-  font-size: 0.75em;
 }
 
 /* ---- Calendar panel ---- */

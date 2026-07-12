@@ -91,4 +91,45 @@ describe('HebDatePickerComponent', () => {
     expect(title).toBe('אלול תשפ״ו');
     expect(el.querySelectorAll('.hdp-cell--selected').length).toBe(1);
   });
+
+  describe('popup field (inline=false)', () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput('inline', false);
+      fixture.detectChanges();
+    });
+
+    it('renders a calendar icon after the text (RTL: last DOM child renders on the left)', () => {
+      const field = el.querySelector('.hdp-field')!;
+      const children = Array.from(field.children);
+      const textIdx = children.findIndex((c) => c.classList.contains('hdp-field__text'));
+      const iconIdx = children.findIndex((c) => c.classList.contains('hdp-field__icon'));
+      expect(textIdx).toBeGreaterThanOrEqual(0);
+      expect(iconIdx).toBeGreaterThan(textIdx);
+      expect(field.querySelector('.hdp-field__icon')?.tagName.toLowerCase()).toBe('svg');
+    });
+
+    it('shows the selected date, formatted in gematriya, inside the field', () => {
+      fixture.componentInstance.writeValue(new Date(2026, 8, 3)); // 21 Elul 5786
+      fixture.detectChanges();
+      const text = el.querySelector('.hdp-field__text')!.textContent!.trim();
+      expect(text).toBe('כ״א אלול תשפ״ו');
+    });
+
+    it('shows "start – end" for a selected range', () => {
+      fixture.componentRef.setInput('mode', 'range');
+      fixture.detectChanges();
+      fixture.componentInstance.writeValue({
+        start: new Date(2026, 8, 3), // 21 Elul 5786
+        end: new Date(2026, 8, 7), // 25 Elul 5786
+      });
+      fixture.detectChanges();
+      const text = el.querySelector('.hdp-field__text')!.textContent!.trim();
+      expect(text).toBe('כ״א אלול תשפ״ו – כ״ה אלול תשפ״ו');
+    });
+
+    it('shows the placeholder when nothing is selected yet', () => {
+      const text = el.querySelector('.hdp-field__text')!.textContent!.trim();
+      expect(text).toBe('בחר תאריך');
+    });
+  });
 });
