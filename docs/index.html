@@ -335,25 +335,46 @@ HebPicker.prototype.panelHTML=function(){
     +'<div class="hdp-grid">'+wd+grid+'</div>'+legend+'</div>';
 };
 HebPicker.prototype.render=function(){
-  var o=this.o;
-  if(o.inline){this.host.className='hdp';this.host.innerHTML=this.panelHTML();}
+  var o=this.o,self=this;
+  if(o.inline){this.host.className='hdp';this.host.innerHTML=this.panelHTML();this.bindPanel(this.host);}
   else{
     this.host.className='hdp pop';
     var disp=this.readable();var empty=(disp==='—');
-    var field='<button type="button" class="hdp-field'+(empty?' empty':'')+'"><span class="txt">'+(empty?o.placeholder:disp)+'</span>'
+    this.host.innerHTML='<button type="button" class="hdp-field'+(empty?' empty':'')+'"><span class="txt">'+(empty?o.placeholder:disp)+'</span>'
       +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></button>';
-    this.host.innerHTML=field+(this.open?this.panelHTML():'');
+    this.host.querySelector('.hdp-field').onclick=function(e){e.stopPropagation();self.open=!self.open;self.render();};
+    if(this.open)this.showFloat();else this.removeFloat();
   }
-  this.bind();
 };
-HebPicker.prototype.bind=function(){
+HebPicker.prototype.bindPanel=function(root){
   var self=this;
-  var field=this.host.querySelector('.hdp-field');
-  if(field)field.onclick=function(e){e.stopPropagation();self.open=!self.open;self.render();};
-  var navs=this.host.querySelectorAll('[data-nav]');
-  navs.forEach(function(b){b.onclick=function(){self.nav(b.getAttribute('data-nav'));};});
-  var cells=this.host.querySelectorAll('.hdp-cell');
-  cells.forEach(function(b){b.onclick=function(){self.pick(parseInt(b.getAttribute('data-rd'),10),b);};});
+  root.querySelectorAll('[data-nav]').forEach(function(b){b.onclick=function(){self.nav(b.getAttribute('data-nav'));};});
+  root.querySelectorAll('.hdp-cell').forEach(function(b){b.onclick=function(){self.pick(parseInt(b.getAttribute('data-rd'),10),b);};});
+};
+// Popup panel is portaled to <body> (position:fixed) so it floats above
+// everything and is never clipped by an ancestor's overflow.
+HebPicker.prototype.showFloat=function(){
+  this.removeFloat();
+  var el=document.createElement('div');
+  el.className='hdp hdp-float';el.style.position='fixed';el.style.zIndex='1000';
+  el.innerHTML=this.panelHTML();
+  document.body.appendChild(el);
+  this.floatEl=el;this.bindPanel(el);this.positionFloat();
+  var self=this;this._repos=function(){self.positionFloat();};
+  window.addEventListener('scroll',this._repos,true);
+  window.addEventListener('resize',this._repos);
+};
+HebPicker.prototype.positionFloat=function(){
+  if(!this.floatEl)return;
+  var field=this.host.querySelector('.hdp-field');if(!field)return;
+  var r=field.getBoundingClientRect(),el=this.floatEl;
+  el.style.left='auto';el.style.right=(window.innerWidth-r.right)+'px';el.style.top=(r.bottom+6)+'px';
+  var h=el.offsetHeight;
+  if(r.bottom+6+h>window.innerHeight&&r.top-6-h>0)el.style.top=(r.top-6-h)+'px';
+};
+HebPicker.prototype.removeFloat=function(){
+  if(this.floatEl){this.floatEl.remove();this.floatEl=null;}
+  if(this._repos){window.removeEventListener('scroll',this._repos,true);window.removeEventListener('resize',this._repos);this._repos=null;}
 };
 HebPicker.prototype.nav=function(what){
   if(what==='today'){var t=rdToHeb(todayRD());this.vy=t.y;this.vm=t.m;}
@@ -384,9 +405,15 @@ function mountPicker(host,opts){var p=new HebPicker(host,opts);pickers.push(p);r
 // hero
 mountPicker(document.getElementById('heroPicker'),{mode:'single',inline:true,legend:true});
 
-// close popups on outside click
+// close popups on outside click (the portaled panel counts as "inside")
 document.addEventListener('click',function(e){
-  pickers.forEach(function(p){if(!p.o.inline&&p.open&&!p.host.contains(e.target)){p.open=false;p.render();}});
+  pickers.forEach(function(p){
+    if(!p.o.inline&&p.open){
+      var inField=p.host.contains(e.target);
+      var inPanel=p.floatEl&&p.floatEl.contains(e.target);
+      if(!inField&&!inPanel){p.open=false;p.render();}
+    }
+  });
 });
 // theme toggle
 var root=document.documentElement;
