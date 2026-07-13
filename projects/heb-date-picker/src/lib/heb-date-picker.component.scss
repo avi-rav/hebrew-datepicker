@@ -313,11 +313,22 @@
    Minimal CDK overlay container styles (subset of @angular/cdk overlay-prebuilt).
    Bundled here so consumers don't need to import a separate CSS file for the
    popup to position correctly.
+
+   The stacking level is driven by `--hdp-overlay-z-index` so the popup can be
+   lifted above an app's own modals/drawers, which commonly sit well above the
+   CDK default of 1000. Set it on :root (the overlay container is a child of
+   <body>, so it can't inherit a value scoped to the picker itself):
+
+     :root { --hdp-overlay-z-index: 4000; }
    -------------------------------------------------------------------------- */
-.cdk-overlay-container {
+/* The doubled class raises specificity to (0,2,0) so this wins over the plain
+   `.cdk-overlay-container` rule in @angular/cdk's overlay-prebuilt.css, whose
+   hard-coded `z-index: 1000` would otherwise silence the variable below
+   depending on stylesheet order. */
+.cdk-overlay-container.cdk-overlay-container {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--hdp-overlay-z-index, 1000);
   pointer-events: none;
 }
 .cdk-overlay-container:empty {
@@ -325,7 +336,7 @@
 }
 .cdk-overlay-connected-position-bounding-box {
   position: absolute;
-  z-index: 1000;
+  z-index: var(--hdp-overlay-z-index, 1000);
   display: flex;
   flex-direction: column;
   min-width: 1px;
@@ -333,7 +344,7 @@
 }
 .cdk-overlay-pane {
   position: absolute;
-  z-index: 1000;
+  z-index: var(--hdp-overlay-z-index, 1000);
   box-sizing: border-box;
   display: flex;
   max-width: 100%;
