@@ -1,6 +1,6 @@
 {
   "name": "heb-date-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Framework-agnostic Hebrew-calendar engine (gematriya dates, month grids, holidays) powering heb-date-picker.",
   "keywords": ["hebrew", "jewish", "calendar", "date", "gematriya", "hebcal"],
   "license": "GPL-2.0",

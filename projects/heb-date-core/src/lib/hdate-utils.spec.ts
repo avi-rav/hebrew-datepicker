@@ -11,6 +11,7 @@ import {
   nextHebYear,
   prevHebYear,
   startOfHebMonth,
+  toISODate,
 } from './hdate-utils';
 
 describe('gematriya formatting', () => {
@@ -97,5 +98,23 @@ describe('day classification helpers', () => {
     const d = startOfHebMonth(5786, months.ELUL);
     expect(d.getHours()).toBe(0);
     expect(d.getMinutes()).toBe(0);
+  });
+});
+
+describe('toISODate', () => {
+  it('formats using local calendar fields, zero-padded', () => {
+    expect(toISODate(new Date(2026, 8, 3))).toBe('2026-09-03');
+    expect(toISODate(new Date(2026, 0, 5))).toBe('2026-01-05');
+  });
+
+  it('reads the LOCAL calendar day, unlike toISOString() (regression guard)', () => {
+    // Motivating bug: a Date normalized to local midnight, if serialized with
+    // the built-in toISOString(), shifts to the previous day in any timezone
+    // ahead of UTC (e.g. Israel, UTC+2/+3) — toISOString() converts to UTC
+    // first. toISODate must read the Date's local fields directly instead of
+    // going through any UTC conversion, so it can't fall prey to that bug
+    // regardless of which timezone the test runner itself is in.
+    const local = new Date(2026, 8, 3); // 3 Sep 2026, local midnight
+    expect(toISODate(local)).toBe(`${local.getFullYear()}-09-03`);
   });
 });

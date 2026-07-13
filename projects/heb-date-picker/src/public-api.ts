@@ -17,4 +17,4 @@ export type {
   FormatOptions,
   Constraints,
 } from 'heb-date-core';
-export { formatGematriya, months } from 'heb-date-core';
+export { formatGematriya, toISODate, months } from 'heb-date-core';

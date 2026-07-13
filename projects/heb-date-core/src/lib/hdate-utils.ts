@@ -30,6 +30,24 @@ export function isSameDay(a: Date | null, b: Date | null): boolean {
   );
 }
 
+/**
+ * Format a Gregorian `Date` as a local `YYYY-MM-DD` string — safe for sending
+ * a date-only value to a server or `<input type="date">`.
+ *
+ * Deliberately NOT `date.toISOString()`: that method converts to UTC, and
+ * every picker value here is normalized to *local* midnight. In any positive
+ * UTC-offset timezone (e.g. Israel, UTC+2/+3) `toISOString()` rolls the date
+ * back by one day — e.g. local midnight of 3 Sep 2026 becomes
+ * `"2026-09-02T21:00:00.000Z"`. Reading just the date part of that string
+ * silently returns the wrong Gregorian day.
+ */
+export function toISODate(date: Date): string {
+  const y = date.getFullYear().toString().padStart(4, '0');
+  const m = (date.getMonth() + 1).toString().padStart(2, '0');
+  const d = date.getDate().toString().padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 /** Convert a Gregorian `Date` to an `HDate` (by its calendar Y/M/D). */
 export function toHDate(date: Date): HDate {
   return new HDate(atMidnight(date));

@@ -136,12 +136,19 @@ export class MyExistingForm {
 
 ### דוגמה: קריאת הערך ושמירה לשרת + תצוגה למשתמש
 
+> ⚠️ **אל תשתמשו ב-`date.toISOString()`** לתאריך-בלבד (ללא שעה). המתודה הזו
+> ממירה ל-**UTC**, והערך שהרכיב מחזיר מנורמל לחצות **מקומית** — כך שבכל אזור
+> זמן שמוקדם מ-UTC (למשל **ישראל, UTC+2/+3**) התאריך "גולש" יום אחורה. למשל
+> `כ״א אלול` (3 בספטמבר 2026 מקומי) הופך ל-`"2026-09-02T21:00:00.000Z"`. מי
+> שקורא רק את חלק התאריך מקבל את היום **הלא נכון**. במקום זה, השתמשו ב-
+> `toISODate()` המיוצאת מהחבילה — היא קוראת את שדות התאריך המקומיים ישירות.
+
 ```ts
-import { formatGematriya, type PickerValue } from 'heb-date-picker';
+import { formatGematriya, toISODate, type PickerValue } from 'heb-date-picker';
 
 onPick(value: PickerValue) {
   if (value instanceof Date) {
-    const iso = value.toISOString();       // "2026-09-02T21:00:00.000Z" → לשרת/DB
+    const iso = toISODate(value);           // "2026-09-03" → לשרת/DB (בטוח מאזור זמן)
     const label = formatGematriya(value);   // "כ״א אלול תשפ״ו" → לתצוגה למשתמש
     this.save({ date: iso, label });
   }
@@ -248,10 +255,11 @@ noWeekends = (d: Date) => d.getDay() === 5 || d.getDay() === 6;
 ### פונקציות עזר מיוצאות
 
 ```ts
-import { formatGematriya, months } from 'heb-date-picker';
+import { formatGematriya, toISODate, months } from 'heb-date-picker';
 
 formatGematriya(new Date(2026, 8, 3));                 // "כ״א אלול תשפ״ו"
 formatGematriya(new Date(2026, 8, 3), { nikud: true }); // "כ״א אֱלוּל תשפ״ו"
+toISODate(new Date(2026, 8, 3));                        // "2026-09-03" (מקומי — לא UTC)
 ```
 
 ---
