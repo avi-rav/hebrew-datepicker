@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm run build:libs",
     "test": "ng test",
     "build:libs": "ng build heb-date-core && ng build heb-date-picker",
     "smoke": "node scripts/smoke.mjs",
