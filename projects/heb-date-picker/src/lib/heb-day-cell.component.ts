@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } from '@angular/core';
 import type { HebDay } from 'heb-date-core';
 
 /**
@@ -45,7 +45,7 @@ export class HebDayCellComponent {
   /** The day to render. */
   readonly day = input.required<HebDay>();
   /** Whether this cell holds the roving tabindex (only one per grid). */
-  readonly focusable = input<boolean>(false);
+  readonly focusable = input(false, { transform: booleanAttribute });
   /** Emitted when a selectable day is clicked. */
   readonly pick = output<HebDay>();
 

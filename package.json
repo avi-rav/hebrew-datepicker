@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:libs": "ng build heb-date-core && ng build heb-date-picker",
+    "smoke": "node scripts/smoke.mjs",
+    "verify:pack": "node scripts/verify-pack.mjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
