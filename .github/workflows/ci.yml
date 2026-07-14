@@ -21,6 +21,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # tsconfig.json maps `heb-date-core` / `heb-date-picker` to ./dist, not to
+      # src — so the specs (and the demo app) cannot even resolve their imports
+      # until the libraries have been built. A dev machine usually has a stale
+      # dist lying around and hides this; a clean checkout does not.
+      - run: npm run build:libs
       - run: npm test
 
   # Builds the libraries from source, packs them, scaffolds a real Angular app at
