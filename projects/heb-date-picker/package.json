@@ -1,6 +1,6 @@
 {
   "name": "heb-date-picker",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "description": "Hebrew (Jewish) calendar date picker for Angular with gematriya dates (e.g. כ״א אלול תשפ״ו), RTL, holidays, single & range modes, and Forms integration.",
   "keywords": [
     "angular",
@@ -25,7 +25,7 @@
     "@angular/forms": "^22.0.0"
   },
   "dependencies": {
-    "heb-date-core": "^0.2.0",
+    "heb-date-core": "^1.0.0",
     "tslib": "^2.3.0"
   },
   "sideEffects": false

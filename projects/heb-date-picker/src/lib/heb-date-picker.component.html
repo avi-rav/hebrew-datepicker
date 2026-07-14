@@ -33,10 +33,23 @@
       (navigate)="onNavigate($event)"
     />
 
-    <div class="hdp-legend" aria-hidden="true">
-      <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--holiday"></span>חג / מועד</span>
-      <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--shabbat"></span>שבת</span>
-      <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--today"></span>היום</span>
+    <div class="hdp-footer">
+      <div class="hdp-legend" aria-hidden="true">
+        <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--holiday"></span>חג / מועד</span>
+        <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--shabbat"></span>שבת</span>
+        <span class="hdp-legend__item"><span class="hdp-legend__swatch hdp-legend__swatch--today"></span>היום</span>
+      </div>
+
+      <button
+        type="button"
+        class="hdp-today-btn"
+        (click)="goToday()"
+        aria-label="חזרה ליום הנוכחי"
+        title="חזרה ליום הנוכחי"
+        [disabled]="disabled()"
+      >
+        <span class="hdp-today-btn__ring" aria-hidden="true"></span>היום
+      </button>
     </div>
   </div>
 </ng-template>

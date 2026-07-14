@@ -266,14 +266,60 @@
   }
 }
 
-/* ---- Legend ---- */
+/* ---- Footer: legend + "back to today" ---- */
+.hdp-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--hdp-border);
+}
+
+/* `dir: rtl` puts the flex start on the right, so an auto start-margin pushes
+   the button to the panel's bottom-left corner. */
+.hdp-today-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  padding: 0.25rem 0.5rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--hdp-fg);
+  background: transparent;
+  border: 1px solid var(--hdp-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--hdp-hover);
+    border-color: var(--hdp-today-ring);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--hdp-accent);
+    outline-offset: 1px;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+/* Echoes the ring drawn around today's cell, so the button reads as "that day". */
+.hdp-today-btn__ring {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--hdp-today-ring);
+}
+
 .hdp-legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 0.6rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--hdp-border);
   font-size: 0.72rem;
   color: var(--hdp-muted);
 }

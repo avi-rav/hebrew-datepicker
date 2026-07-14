@@ -94,8 +94,13 @@
   .hdp-cell.sel, .hdp-cell.rs, .hdp-cell.re { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
   .hdp-cell.sel .dot, .hdp-cell.rs .dot, .hdp-cell.re .dot { background: var(--accent-ink); }
   .hdp-cell.dis { color: var(--disabled); cursor: not-allowed; text-decoration: line-through; }
-  .hdp-legend { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid var(--line); font-size: 0.72rem; color: var(--ink-soft); }
+  .hdp-foot { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid var(--line); }
+  .hdp-legend { display: flex; flex-wrap: wrap; gap: 0.7rem; font-size: 0.72rem; color: var(--ink-soft); }
   .hdp-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+  /* dir:rtl — an auto start-margin pushes the button to the panel's bottom-left. */
+  .hdp-today { display: inline-flex; align-items: center; gap: 0.3rem; flex: 0 0 auto; margin-inline-start: auto; padding: 0.25rem 0.5rem; font: inherit; font-size: 0.72rem; font-weight: 600; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; }
+  .hdp-today:hover { background: var(--surface-2); border-color: var(--accent); }
+  .hdp-today .ring { width: 0.7rem; height: 0.7rem; border-radius: 50%; box-shadow: inset 0 0 0 1.6px var(--accent); }
   .sw { width: 0.7rem; height: 0.7rem; border-radius: 3px; }
   .sw-h { background: var(--gold-dot); } .sw-s { background: var(--shabbat); } .sw-t { box-shadow: inset 0 0 0 1.6px var(--accent); } .sw-x { background: var(--accent); }
   /* popup field */
@@ -326,13 +331,16 @@ HebPicker.prototype.panelHTML=function(){
     grid+='<button type="button" class="'+cls+'" data-rd="'+c.rd+'"'+title+'>'+c.label+(c.hol.length?'<span class="dot"></span>':'')+'</button>';
   }
   var legend=o.legend?'<div class="hdp-legend"><span><span class="sw sw-x"></span>נבחר</span><span><span class="sw sw-h"></span>חג</span><span><span class="sw sw-s"></span>שבת</span><span><span class="sw sw-t"></span>היום</span></div>':'';
+  var foot='<div class="hdp-foot">'+legend
+    +'<button type="button" class="hdp-today" data-nav="today" title="חזרה ליום הנוכחי" aria-label="חזרה ליום הנוכחי"><span class="ring"></span>היום</button>'
+    +'</div>';
   return '<div class="hdp-panel">'
     +'<div class="hdp-head">'
     +'<div class="hdp-nav"><button type="button" data-nav="py" aria-label="שנה קודמת">«</button><button type="button" data-nav="pm" aria-label="חודש קודם">‹</button></div>'
     +'<button type="button" class="hdp-title" data-nav="today">'+monthTitle(this.vy,this.vm)+'</button>'
     +'<div class="hdp-nav"><button type="button" data-nav="nm" aria-label="חודש הבא">›</button><button type="button" data-nav="ny" aria-label="שנה הבאה">»</button></div>'
     +'</div>'
-    +'<div class="hdp-grid">'+wd+grid+'</div>'+legend+'</div>';
+    +'<div class="hdp-grid">'+wd+grid+'</div>'+foot+'</div>';
 };
 HebPicker.prototype.render=function(){
   var o=this.o,self=this;

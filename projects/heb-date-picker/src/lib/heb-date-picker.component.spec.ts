@@ -80,6 +80,22 @@ describe('HebDatePickerComponent', () => {
     expect(titleAfter).not.toBe(titleBefore);
   });
 
+  it('returns to the current month when the "today" button is clicked', () => {
+    const title = () => el.querySelector('.hdp-header__title')!.textContent!.trim();
+    const titleOfToday = title();
+
+    el.querySelector<HTMLButtonElement>('[aria-label="חודש הבא"]')!.click();
+    el.querySelector<HTMLButtonElement>('[aria-label="שנה הבאה"]')!.click();
+    fixture.detectChanges();
+    expect(title()).not.toBe(titleOfToday);
+    expect(el.querySelector('.hdp-cell--today')).toBeFalsy();
+
+    el.querySelector<HTMLButtonElement>('.hdp-today-btn')!.click();
+    fixture.detectChanges();
+    expect(title()).toBe(titleOfToday);
+    expect(el.querySelector('.hdp-cell--today')).toBeTruthy();
+  });
+
   it('marks Shabbat cells in the grid', () => {
     expect(el.querySelectorAll('.hdp-cell--shabbat').length).toBeGreaterThanOrEqual(4);
   });
@@ -150,6 +166,22 @@ describe('HebDatePickerComponent', () => {
       expect(panel()).toBeTruthy();
       const titleAfter = panel()!.querySelector('.hdp-header__title')!.textContent!.trim();
       expect(titleAfter).not.toBe(titleBefore);
+
+      fixture.componentInstance.open.set(false);
+      fixture.detectChanges();
+    });
+
+    it('keeps the panel open when the "today" button is clicked', () => {
+      const overlay = TestBed.inject(OverlayContainer).getContainerElement();
+      fixture.componentInstance.toggleOpen();
+      fixture.detectChanges();
+
+      overlay.querySelector<HTMLButtonElement>('.hdp-today-btn')!.click();
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.open()).toBe(true);
+      expect(overlay.querySelector('.hdp-cell--today')).toBeTruthy();
+      expect(fixture.componentInstance.value()).toBeNull(); // navigation only, no selection
 
       fixture.componentInstance.open.set(false);
       fixture.detectChanges();
