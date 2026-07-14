@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Node 24 is the current Active LTS and is the one line that satisfies the
+      # `engines` of every Angular CLI major we test (19: >=22, 20/21: >=24 or
+      # ^22.12, 22: ^24.15). Node 22 (Maintenance LTS) would also work today but
+      # has a shorter support runway. If you add a new Angular major to the smoke
+      # matrix below, check its CLI's `engines.node` before assuming 24 still fits.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # `pretest` builds the libraries first: tsconfig.json maps `heb-date-core` /
+      # `heb-date-picker` to ./dist, not to src, so on a clean checkout the specs
+      # and the demo app cannot resolve their imports until dist exists.
+      - run: npm test
+
+  # Builds the libraries from source, packs them, scaffolds a real Angular app at
+  # each supported major, installs the tarballs with strict peer resolution, and
+  # production-builds it — forcing that major's partial linker to re-link our
+  # bundle. See scripts/smoke.mjs for the full list of gates (it checks much more
+  # than the build exit code). e2e (headless Playwright) runs on the range edges:
+  # 19 (oldest supported, zone-based) and 22 (newest, zoneless).
+  smoke:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        angular: [19, 20, 21, 22]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node scripts/smoke.mjs ${{ matrix.angular }} ${{ (matrix.angular == 19 || matrix.angular == 22) && '--e2e' || '' }}

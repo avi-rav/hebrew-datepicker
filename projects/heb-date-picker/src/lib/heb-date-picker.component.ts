@@ -5,6 +5,7 @@ import {
   Injector,
   ViewEncapsulation,
   afterNextRender,
+  booleanAttribute,
   computed,
   forwardRef,
   inject,
@@ -15,7 +16,11 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { OverlayModule, type ConnectedPosition } from '@angular/cdk/overlay';
+import {
+  CdkConnectedOverlay,
+  CdkOverlayOrigin,
+  type ConnectedPosition,
+} from '@angular/cdk/overlay';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
   RangeSelectionModel,
@@ -57,7 +62,10 @@ export type PickerValue = Date | HebRange | null;
   selector: 'heb-date-picker',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
-  imports: [HebCalendarMonthComponent, OverlayModule, NgTemplateOutlet],
+  // Standalone directives only — importing an NgModule (e.g. OverlayModule) bakes
+  // version-specific private aliases (ɵɵ*) into the partial declaration, breaking
+  // older Angular majors at runtime while ng build still exits 0.
+  imports: [HebCalendarMonthComponent, CdkConnectedOverlay, CdkOverlayOrigin, NgTemplateOutlet],
   templateUrl: './heb-date-picker.component.html',
   styleUrl: './heb-date-picker.component.scss',
   host: {
@@ -87,13 +95,13 @@ export class HebDatePickerComponent implements ControlValueAccessor {
   /** Predicate returning `true` to disable a given day. */
   readonly disabledDates = input<((date: Date) => boolean) | undefined>(undefined);
   /** Render gematriya with vowel points (nekudot). */
-  readonly showNikud = input<boolean>(false);
+  readonly showNikud = input(false, { transform: booleanAttribute });
   /** Use the Israel holiday schedule (`true`) or Diaspora (`false`). */
-  readonly israel = input<boolean>(true);
+  readonly israel = input(true, { transform: booleanAttribute });
   /** First column weekday: 0=Sunday (default) .. 6=Saturday. */
   readonly firstDayOfWeek = input<number>(0);
   /** Render the calendar inline instead of in a popup with a text field. */
-  readonly inline = input<boolean>(false);
+  readonly inline = input(false, { transform: booleanAttribute });
   /** Placeholder for the popup text field. */
   readonly placeholder = input<string>('בחר תאריך');
 

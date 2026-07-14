@@ -3,8 +3,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "strict": true,
     "outDir": "../../out-tsc/spec",
     "types": ["vitest/globals"]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true
   },
   "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
 }
