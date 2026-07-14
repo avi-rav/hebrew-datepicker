@@ -14,7 +14,7 @@
 
 ## 🌐 דמו חי
 
-**[לחצו כאן לפתיחת דף ה-Demo](https://claude.ai/code/artifact/c5ef5418-2ec4-445e-817d-6d5cdb3160f6)**
+**[avi-rav.github.io/hebrew-datepicker](https://avi-rav.github.io/hebrew-datepicker/)**
 — רואים בו את כל האפשרויות בפעולה: בחירת יום, טווח, מגבלות, סימון חגים ושבתות,
 ניקוד, מיתוג בצבעים שונים, ומצב בהיר/כהה.
 
@@ -27,6 +27,7 @@
 - 📌 מצב יום יחיד (`single`) או טווח (`range`)
 - 🚫 `min` / `max` + פרדיקט `disabledDates` לימים חסומים
 - 🕯️ סימון אוטומטי של שבתות, חגים/מועדים וראשי-חודשים (ארץ ישראל או תפוצות)
+- 📍 כפתור "היום" — חזרה מהירה לחודש הנוכחי מכל מקום בלוח
 - ♿ נגישות: `role="grid"`, ניווט מקלדת מלא, `aria-*`
 - 🎨 מיתוג דרך CSS Custom Properties (בלי לגעת בקוד)
 - 🔌 `ControlValueAccessor` — עובד עם `[(ngModel)]` ו-Reactive Forms
