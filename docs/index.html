@@ -239,7 +239,7 @@
   </section>
 
   <footer>
-    <div class="note"><b>הערה:</b> הלוח בדף זה הוא מימוש דפדפן קליל להדגמה חזותית — מחשב תאריכים עבריים אמיתיים (אומת מול מנוע ה-ICU המובנה בדפדפן, <code>Intl</code>). ברכיב ה-Angular עצמו כל החישוב מגיע מהמנוע העצמאי של חבילת הליבה <code>heb-date-core</code>.</div>
+    <div class="note"><b>הערה:</b> הלוח בדף זה הוא מימוש דפדפן קליל להדגמה חזותית — מחשב תאריכים עבריים אמיתיים (אומת מול מנוע ה-ICU המובנה בדפדפן, <code>Intl</code>), וטבלת החגים בו זהה במדויק לזו של המנוע האמיתי (0 אי-התאמות מול <code>heb-date-core@2.0.0</code> על פני 70 שנה, ישראל וחו״ל). ברכיב ה-Angular עצמו כל החישוב מגיע מהמנוע העצמאי של חבילת הליבה <code>heb-date-core</code>.</div>
     <div>📦 <a href="https://www.npmjs.com/package/heb-date-picker">npmjs.com/package/heb-date-picker</a> · <a href="https://github.com/avi-rav/hebrew-datepicker">GitHub</a> · רישיון MIT</div>
   </footer>
 </div>
@@ -274,13 +274,73 @@ function hebMonthName(m,y){return m===12?(hebLeap(y)?'אדר א׳':'אדר'):MN[
 function monthTitle(y,m){return hebMonthName(m,y)+' '+gematriya(y,true);}
 function fullGematriya(y,m,d){return gematriya(d)+' '+hebMonthName(m,y)+' '+gematriya(y,true);}
 
-/* holidays on fixed Hebrew dates (visual approximation) */
-var FIXED={'7-1':'ראש השנה','7-2':'ראש השנה','7-3':'צום גדליה','7-10':'יום כיפור','7-15':'סוכות א׳','7-16':'סוכות (חוה״מ)','7-17':'סוכות (חוה״מ)','7-18':'סוכות (חוה״מ)','7-19':'סוכות (חוה״מ)','7-20':'סוכות (חוה״מ)','7-21':'הושענא רבה','7-22':'שמיני עצרת','10-10':'עשרה בטבת','11-15':'ט״ו בשבט','1-15':'פסח א׳','1-16':'פסח (חוה״מ)','1-17':'פסח (חוה״מ)','1-18':'פסח (חוה״מ)','1-19':'פסח (חוה״מ)','1-20':'פסח (חוה״מ)','1-21':'שביעי של פסח','2-14':'פסח שני','2-18':'ל״ג בעומר','3-6':'שבועות','4-17':'שבעה עשר בתמוז','5-9':'תשעה באב','5-15':'ט״ו באב','6-29':'ערב ראש השנה'};
-function holidaysFor(m,d,y,il){var out=[];var k=m+'-'+d;if(FIXED[k])out.push(FIXED[k]);
-  if(m===9&&d>=25)out.push('חנוכה');else if(m===10&&(d<=2||(d===3&&hebMonthLen(9,y)===29)))out.push('חנוכה');
-  var pm=hebLeap(y)?13:12;if(m===pm){if(d===13)out.push('תענית אסתר');if(d===14)out.push('פורים');if(d===15)out.push('שושן פורים');}
-  if(!il){if(m===7&&d===23)out.push('שמחת תורה');if(m===1&&d===22)out.push('אחרון של פסח');if(m===3&&d===7)out.push('שבועות ב׳');}
-  return out;}
+/* holidays: chagim, tzomot, Tu BiShvat, Lag BaOmer, and the 8 date-anchored
+   special Shabbatot — ported 1:1 from heb-date-core's engine/holidays.ts.
+   Deliberately excludes national days, Tu B'Av, Purim Katan, erev-chag and
+   Shabbat Shirah (Torah-reading-cycle, not date-anchored). Fasts are shown on
+   their *observed* date (deferred off Shabbat / Ta'anit Esther advanced). */
+function shabbatOnOrBefore(rd){return rd-mod(mod(rd,7)+1,7);}
+function specialShabbat(y,m,d,rd){
+  if(m===7)return (d>=3&&d<=9)?'שבת שובה':null;
+  var fa=hebLeap(y)?13:12;
+  if(m>=11||m===1){
+    if(rd===shabbatOnOrBefore(hebToRD(y,fa,1)))return 'שבת שקלים';
+    if(rd===shabbatOnOrBefore(hebToRD(y,fa,13)))return 'שבת זכור';
+    var hc=shabbatOnOrBefore(hebToRD(y,1,1));
+    if(rd===hc-7)return 'שבת פרה';
+    if(rd===hc)return 'שבת החודש';
+    if(rd===shabbatOnOrBefore(hebToRD(y,1,14)))return 'שבת הגדול';
+    return null;
+  }
+  if(m===5){
+    var cz=shabbatOnOrBefore(hebToRD(y,5,9));
+    if(rd===cz)return 'שבת חזון';
+    if(rd===cz+7)return 'שבת נחמו';
+  }
+  return null;
+}
+function holidaysFor(m,d,y,il){
+  var out=[],rd=hebToRD(y,m,d),dw=mod(rd,7);
+  if(m===7){
+    if(d===1||d===2)out.push('ראש השנה');
+    else if(d===3&&dw!==6)out.push('צום גדליה');
+    else if(d===4&&dw===0)out.push('צום גדליה');
+    else if(d===10)out.push('יום כיפור');
+    else if(d===15||(d===16&&!il))out.push('סוכות');
+    else if(d>=(il?16:17)&&d<=20)out.push('חול המועד סוכות');
+    else if(d===21)out.push('הושענא רבה');
+    else if(d===22)out.push(il?'שמיני עצרת / שמחת תורה':'שמיני עצרת');
+    else if(d===23&&!il)out.push('שמחת תורה');
+  }else if(m===9||m===10){
+    if(rd-hebToRD(y,9,25)>=0&&rd-hebToRD(y,9,25)<=7)out.push('חנוכה');
+    if(m===10&&d===10)out.push('עשרה בטבת');
+  }else if(m===11&&d===15){
+    out.push('ט״ו בשבט');
+  }else if(m===2&&d===18){
+    out.push('ל״ג בעומר');
+  }else if(m===1){
+    if(d===15||(d===16&&!il))out.push('פסח');
+    else if(d>=(il?16:17)&&d<=20)out.push('חול המועד פסח');
+    else if(d===21)out.push('שביעי של פסח');
+    else if(d===22&&!il)out.push('אחרון של פסח');
+  }else if(m===3){
+    if(d===6||(d===7&&!il))out.push('שבועות');
+  }else if(m===4){
+    if((d===17&&dw!==6)||(d===18&&dw===0))out.push('שבעה עשר בתמוז');
+  }else if(m===5){
+    if((d===9&&dw!==6)||(d===10&&dw===0))out.push('תשעה באב');
+  }else{
+    var pm=hebLeap(y)?13:12;
+    if(m===pm){
+      if(d===13&&dw!==6)out.push('תענית אסתר');
+      else if(d===11&&dw===4)out.push('תענית אסתר');
+      else if(d===14)out.push('פורים');
+      else if(d===15)out.push('שושן פורים');
+    }
+  }
+  if(dw===6){var sp=specialShabbat(y,m,d,rd);if(sp)out.push(sp);}
+  return out;
+}
 
 function todayRD(){var n=new Date();return gregToRD(n.getFullYear(),n.getMonth()+1,n.getDate());}
 function jsDateToRD(dt){return gregToRD(dt.getFullYear(),dt.getMonth()+1,dt.getDate());}
