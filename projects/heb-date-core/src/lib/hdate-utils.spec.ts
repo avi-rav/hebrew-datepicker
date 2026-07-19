@@ -16,7 +16,7 @@ import {
 
 describe('gematriya formatting', () => {
   it('formats a full date without nikud (the headline use case)', () => {
-    // 21 Elul 5786 === 3 Sep 2026 (verified against @hebcal/core).
+    // 21 Elul 5786 === 3 Sep 2026 (verified against ICU; see icu-oracle.spec.ts).
     expect(formatGematriya(new Date(2026, 8, 3))).toBe('כ״א אלול תשפ״ו');
   });
 

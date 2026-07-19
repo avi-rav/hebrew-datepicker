@@ -1,17 +1,30 @@
 /**
- * Thin wrapper around `@hebcal/core` — the ONLY module in the codebase that
- * imports it directly.
+ * Public facade over the internal Hebrew-calendar engine (`./engine/*`) — the
+ * ONLY module the rest of the codebase (and the Angular/React UI on top)
+ * imports calendar logic from.
  *
- * Dependency-Inversion in action: every other file (and the Angular/React UI on
- * top) depends on the small, stable functions exported here rather than on the
- * hebcal API surface. Swapping or upgrading the calendar engine is a change
- * localized to this file.
+ * Dependency-Inversion in action: every other file depends on the small,
+ * stable functions exported here rather than on the engine's internals.
+ * Swapping or upgrading the calendar engine is a change localized to this
+ * directory — exactly how the previous `@hebcal/core` backend was replaced by
+ * the self-contained engine without touching any consumer.
  */
 
-import { HDate, HebrewCalendar, gematriya, months } from '@hebcal/core';
+import { gematriya } from './engine/gematriya';
+import { HDate } from './engine/hdate';
+import {
+  hebMonthLength,
+  hebrewToRD,
+  isHebLeapYear,
+  months,
+  rdToHebrew,
+} from './engine/hebrew-calendar';
+import { holidaysForHebDate } from './engine/holidays';
+import { monthName } from './engine/month-names';
 import type { FormatOptions, HebMonthRef } from './types';
 
 export { months };
+export { HDate };
 
 /** Strip the time component: return a new Date at local midnight. */
 export function atMidnight(date: Date): Date {
@@ -66,7 +79,7 @@ export function startOfHebMonth(year: number, month: number): Date {
 
 /** Number of days in the given Hebrew month (handles Cheshvan/Kislev variance). */
 export function daysInHebMonth(year: number, month: number): number {
-  return new HDate(1, month, year).daysInMonth();
+  return hebMonthLength(year, month);
 }
 
 /**
@@ -74,8 +87,9 @@ export function daysInHebMonth(year: number, month: number): number {
  * With `{ nikud: true }` returns the vowelized form `"כ״א אֱלוּל תשפ״ו"`.
  */
 export function formatGematriya(date: Date, opts: FormatOptions = {}): string {
-  // renderGematriya(suppressNikud): pass `true` to omit vowel points.
-  return toHDate(date).renderGematriya(!opts.nikud);
+  const hd = toHDate(date);
+  const name = monthName(hd.getFullYear(), hd.getMonth(), !!opts.nikud);
+  return `${gematriya(hd.getDate())} ${name} ${gematriya(hd.getFullYear())}`;
 }
 
 /** Gematriya label for a Hebrew day-of-month number, e.g. `21 -> "כ״א"`. */
@@ -86,19 +100,15 @@ export function dayLabel(hebDay: number): string {
 /**
  * Title for a Hebrew month: month name + year in gematriya (no day),
  * e.g. `"אלול תשפ״ו"` or, in a leap year, `"אדר א׳ תשפ״ז"`.
- *
- * Derived from `renderGematriya` (dropping the leading day token) so the month
- * name — including the Adar I/II distinction — always comes from hebcal itself.
  */
 export function monthTitle(year: number, month: number, opts: FormatOptions = {}): string {
-  const rendered = new HDate(1, month, year).renderGematriya(!opts.nikud);
-  return rendered.split(' ').slice(1).join(' ');
+  return `${monthName(year, month, !!opts.nikud)} ${gematriya(year)}`;
 }
 
 /** Holiday/observance descriptions (Hebrew) occurring on `date`. */
 export function holidaysOn(date: Date, israel: boolean): string[] {
-  const events = HebrewCalendar.getHolidaysOnDate(toHDate(date), israel) ?? [];
-  return events.map((ev) => ev.render('he'));
+  const hd = toHDate(date);
+  return holidaysForHebDate(hd.getFullYear(), hd.getMonth(), hd.getDate(), israel);
 }
 
 /** Is this date Shabbat (Saturday)? */
@@ -115,20 +125,18 @@ export function isRoshChodesh(hebDay: number): boolean {
  * The Hebrew month following `{year, month}` in calendar (civil) order.
  *
  * Uses day arithmetic (last day + 1 day) rather than month arithmetic, because
- * hebcal's month numbering is non-contiguous across leap years (Adar I/II) and
- * `add(±1, 'month')` is unreliable across the year boundary.
+ * the month numbering is non-contiguous across leap years (Adar I/II) and the
+ * year number increments at Tishrei (month 7), not at Nisan (month 1).
  */
 export function nextHebMonth(year: number, month: number): HebMonthRef {
-  const last = new HDate(daysInHebMonth(year, month), month, year);
-  const n = last.add(1, 'd');
-  return { year: n.getFullYear(), month: n.getMonth() };
+  const n = rdToHebrew(hebrewToRD(year, month, daysInHebMonth(year, month)) + 1);
+  return { year: n.year, month: n.month };
 }
 
 /** The Hebrew month preceding `{year, month}` in calendar order. */
 export function prevHebMonth(year: number, month: number): HebMonthRef {
-  const first = new HDate(1, month, year);
-  const p = first.add(-1, 'd');
-  return { year: p.getFullYear(), month: p.getMonth() };
+  const p = rdToHebrew(hebrewToRD(year, month, 1) - 1);
+  return { year: p.year, month: p.month };
 }
 
 /** The same month one Hebrew year later (clamped to a valid month). */
@@ -146,7 +154,7 @@ export function prevHebYear(year: number, month: number): HebMonthRef {
  * when moving to a non-leap year it collapses to Adar (12).
  */
 function clampMonth(year: number, month: number): HebMonthRef {
-  if (month === months.ADAR_II && !HDate.isLeapYear(year)) {
+  if (month === months.ADAR_II && !isHebLeapYear(year)) {
     return { year, month: months.ADAR_I };
   }
   return { year, month };

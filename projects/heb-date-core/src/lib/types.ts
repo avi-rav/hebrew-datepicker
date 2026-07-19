@@ -35,7 +35,7 @@ export interface HebDay {
   date: Date;
   /** Hebrew year (e.g. 5786). */
   hebYear: number;
-  /** Hebrew month number as used by @hebcal/core (Nisan=1 … Adar II=13). */
+  /** Hebrew month number (Nisan=1 … Adar II=13; see `months`). */
   hebMonth: number;
   /** Hebrew day of month (1..30). */
   hebDay: number;

@@ -239,15 +239,15 @@
   </section>
 
   <footer>
-    <div class="note"><b>הערה:</b> הלוח בדף זה הוא מימוש דפדפן קליל להדגמה חזותית — מחשב תאריכים עבריים אמיתיים (אומת מול <code>@hebcal/core</code>). ברכיב ה-Angular עצמו כל החישוב מגיע מ-<code>@hebcal/core</code> דרך חבילת הליבה <code>heb-date-core</code>.</div>
-    <div>📦 <a href="https://www.npmjs.com/package/heb-date-picker">npmjs.com/package/heb-date-picker</a> · <a href="https://github.com/avi-rav/hebrew-datepicker">GitHub</a> · רישיון GPL-2.0</div>
+    <div class="note"><b>הערה:</b> הלוח בדף זה הוא מימוש דפדפן קליל להדגמה חזותית — מחשב תאריכים עבריים אמיתיים (אומת מול מנוע ה-ICU המובנה בדפדפן, <code>Intl</code>). ברכיב ה-Angular עצמו כל החישוב מגיע מהמנוע העצמאי של חבילת הליבה <code>heb-date-core</code>.</div>
+    <div>📦 <a href="https://www.npmjs.com/package/heb-date-picker">npmjs.com/package/heb-date-picker</a> · <a href="https://github.com/avi-rav/hebrew-datepicker">GitHub</a> · רישיון MIT</div>
   </footer>
 </div>
 
 <script>
 /* ============================================================
-   Self-contained Hebrew calendar engine (verified vs @hebcal/core:
-   0 mismatches across 14,976 dates + all month titles + day labels).
+   Self-contained Hebrew calendar engine (verified vs the browser's built-in
+   ICU hebrew calendar: 0 mismatches across 14,976 dates + titles + labels).
    ============================================================ */
 function mod(a,b){return ((a%b)+b)%b;}
 function gregLeap(y){return (y%4===0&&y%100!==0)||y%400===0;}

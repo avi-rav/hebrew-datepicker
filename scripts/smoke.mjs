@@ -314,8 +314,8 @@ bootstrapApplication(SmokeComponent, appConfig).catch((err) => console.error(err
 `,
   );
 
-  // Strip bundle budgets: @hebcal/core is heavy and the scaffold's default 1MB
-  // maximumError would fail the build for a reason unrelated to compatibility.
+  // Strip bundle budgets: the scaffold's default budgets could fail the build
+  // for a reason unrelated to version compatibility, which is all we test here.
   const p = join(ctx.app, 'angular.json');
   const j = JSON.parse(readFileSync(p, 'utf8'));
   const targets = j.projects.smoke.architect ?? j.projects.smoke.targets;
